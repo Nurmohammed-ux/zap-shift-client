@@ -48,7 +48,7 @@ const aboutTabs = [
 const AboutUs = () => {
   const [activeTab, setActiveTab] = useState(0);
   return (
-    <div className="mx-6 md:mx-14 bg-white rounded-4xl py-20 px-27 mt-6">
+    <div className="mx-2 md:mx-14 bg-white rounded-4xl py-20 px-6 md:px-27 mt-4">
       <h2 className="text-5xl font-extrabold text-secondary mb-4">About Us</h2>
       <p className="text-gray-500 font-normal mb-12.5">
         Enjoy fast, reliable parcel delivery with real-time tracking and zero

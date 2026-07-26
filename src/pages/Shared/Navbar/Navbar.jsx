@@ -28,7 +28,10 @@ const Navbar = () => {
       <NavLink to={"/pricing"} className={getLinkClass}>
         Pricing
       </NavLink>
-      <NavLink to={"beARider"} className={getLinkClass}>
+      <NavLink to={"/sendParcel"} className={getLinkClass}>
+        Send Parcel
+      </NavLink>
+      <NavLink to={"/beARider"} className={getLinkClass}>
         Be a Rider
       </NavLink>
     </>
@@ -83,7 +86,6 @@ const Navbar = () => {
               Sign In
             </Link>
           )}
-
           <div className="flex items-center">
             <Link className=" btn bg-primary border-0 rounded-xl">
               Be a rider

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import useAuth from "../../../hooks/useAuth";
 
 const Login = () => {
@@ -9,9 +9,12 @@ const Login = () => {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm();
-  const { signInUser } = useAuth();
+  const { signInUser, signInWithGoogle, resetPassword } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleLogin = (data) => {
     console.log("after login", data);
@@ -22,6 +25,7 @@ const Login = () => {
     signInUser(email, password)
       .then((result) => {
         console.log(result.user);
+        navigate(location?.state || "/");
       })
       .catch((error) => {
         console.log(error.code);
@@ -29,17 +33,36 @@ const Login = () => {
       });
   };
 
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center py-36">
-  //       <span className="loading loading-spinner loading-xl text-primary"></span>
-  //     </div>
-  //   );
-  // }
+  const handleLoginWithGoogle = () => {
+    signInWithGoogle()
+      .then((result) => {
+        console.log(result.user);
+        navigate(location?.state || "/");
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
+
+  const handleForgetPassword = () => {
+    const email = getValues("email");
+    if (!email) {
+      alert("Please enter your email first.");
+      return;
+    }
+
+    resetPassword(email)
+      .then(() => {
+        alert("Password reset email sent. Please check your inbox.");
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
 
   return (
     <div>
-      <div className="md:px-30 px-6 lg:pr-50 pt-8 pb-20 w-full shrink-0">
+      <div className="md:px-30 px-6 lg:pr-40 pt-8 lg:pt-20 pb-20 w-full shrink-0">
         <h2 className="text-4xl text-secondary font-extrabold mb-2">
           Welcome Back
         </h2>
@@ -57,7 +80,6 @@ const Login = () => {
               className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
               {...register("email", { required: true })}
               placeholder="Email"
-              required
             />
             {errors.email?.type === "required" && (
               <p className="text-red-500">Email is required</p>
@@ -98,9 +120,12 @@ const Login = () => {
             )}
             {/* Forget password */}
             <div className="my-2">
-              <Link className="link text-secondary text-base  underline link-hover">
+              <p
+                onClick={handleForgetPassword}
+                className="link text-secondary text-base  underline link-hover"
+              >
                 Forgot password?
-              </Link>
+              </p>
             </div>
             <button
               type="submit"
@@ -112,13 +137,20 @@ const Login = () => {
         </form>
         <p className="text-base mt-4">
           Don’t have any account?{" "}
-          <Link to={"/register"} className="text-[#aedb26]">
+          <Link
+            state={location.state}
+            to={"/register"}
+            className="text-[#aedb26]"
+          >
             Register
           </Link>
         </p>
         <p className="text-center py-3">Or</p>
         {/* Google */}
-        <button className="btn bg-gray-200 rounded-lg text-base text-black border-0 w-full">
+        <button
+          onClick={handleLoginWithGoogle}
+          className="btn bg-gray-200 rounded-lg text-base text-black border-0 w-full"
+        >
           <svg
             aria-label="Google logo"
             width="18"

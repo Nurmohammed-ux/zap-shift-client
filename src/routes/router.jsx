@@ -7,7 +7,10 @@ import AboutUs from "../pages/AboutUs/AboutUs";
 import AuthLayout from "../layouts/AuthLayout";
 import Login from "../pages/Auth/Login/Login";
 import Register from "../pages/Auth/Register/Register";
-
+import PrivateRoute from "../routes/PrivateRoute";
+import Rider from "../pages/Rider/Rider";
+import Pricing from "../pages/Pricing/Pricing";
+import SendParcel from "../pages/SendParcel/SendParcel";
 
 const router = createBrowserRouter([
   {
@@ -30,27 +33,47 @@ const router = createBrowserRouter([
       },
       {
         path: "/aboutUs",
-        element: <AboutUs />
+        element: <AboutUs />,
+      },
+      {
+        path: "/beARider",
+        element: (
+          <PrivateRoute>
+            <Rider />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/pricing",
+        element: <Pricing />,
+      },
+      {
+        path: "/sendParcel",
+        element: (
+          <PrivateRoute>
+            <SendParcel />
+          </PrivateRoute>
+        ),
       },
       {
         path: "*",
-        element: <Error />
-      }
+        element: <Error />,
+      },
     ],
   },
   {
     path: "/",
     element: <AuthLayout />,
-    children:[
+    children: [
       {
         path: "/login",
-        element: <Login />
+        element: <Login />,
       },
       {
         path: "/register",
-        element: <Register />
-      }
-    ]
-  }
+        element: <Register />,
+      },
+    ],
+  },
 ]);
 export default router;

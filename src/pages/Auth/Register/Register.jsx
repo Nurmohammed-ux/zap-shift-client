@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router";
+import { FaEye, FaEyeSlash, FaUpload, FaUser } from "react-icons/fa";
+import { Link, useLocation, useNavigate } from "react-router";
 import UseAuth from "../../../hooks/useAuth";
+import axios from "axios";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -11,24 +12,62 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { createUser, updateUser } = UseAuth();
+  const { createUser, updateUser, signInWithGoogle } = UseAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [preview, setPreview] = useState(null);
   // console.log(user);
+
+  const { onChange: onPhotoChange, ...photoRegisterRest } = register("photo", {
+    required: "Photo is required",
+  });
+
+  const handlePhotoChange = (e) => {
+    onPhotoChange(e); // keep react-hook-form's validation/state working
+    const file = e.target.files[0];
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleRegistration = (data) => {
     // console.log("after register", data.email);
     const name = data.name;
     const email = data.email;
     const password = data.password;
+    const profileImg = data.photo[0];
 
     createUser(email, password)
       .then((result) => {
         console.log(result.user);
 
-        updateUser(name)
-          .then(() => {})
-          .catch((error) => {
-            console.log(error.message);
-          });
+        // store image in method formdata
+        const formData = new FormData();
+        formData.append("image", profileImg);
+        // create link for post and post in axios method
+        const imgbbApi = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`;
+        axios.post(imgbbApi, formData).then((res) => {
+          // console.log("after image upload", res.data.data);
+          const photo = res.data.data.url;
+
+          // update user
+          updateUser(name, photo)
+            .then(() => navigate(location?.state || "/"))
+            .catch((error) => {
+              console.log(error.message);
+            });
+        });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
+
+  const handleSignUpWithGoogle = () => {
+    signInWithGoogle()
+      .then((result) => {
+        console.log(result.user);
+        navigate(location?.state || "/");
       })
       .catch((error) => {
         console.log(error.message);
@@ -37,7 +76,7 @@ const Register = () => {
 
   return (
     <div>
-      <div className="md:px-30 px-6 lg:pr-50 pt-8 pb-20 w-full shrink-0">
+      <div className="md:px-30 px-6 lg:pr-40 pt-8 lg:pt-14 pb-20 w-full shrink-0">
         <h2 className="text-4xl text-secondary font-extrabold mb-2">
           Create an Account
         </h2>
@@ -46,6 +85,49 @@ const Register = () => {
         </h4>
         <form onSubmit={handleSubmit(handleRegistration)} className="space-y-4">
           <fieldset className="fieldset">
+            {/* Profile Picture Upload Field */}
+            <div className="flex flex-col items-start my-4">
+              <label
+                htmlFor="photo-upload"
+                className="cursor-pointer relative group"
+              >
+                {/* Circular Container */}
+                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300 hover:border-primary transition-all">
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt="Profile Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="relative flex items-center justify-center text-gray-400">
+                      {/* User Icon */}
+                      <FaUser size={45} className="text-gray-300" />
+                      {/* Upload Arrow Badge */}
+                      <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-md border border-gray-100">
+                        <FaUpload size={14} className="text-primary" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </label>
+
+              {/* Hidden Native File Input bound to React Hook Form */}
+              <input
+                id="photo-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                {...photoRegisterRest}
+                onChange={handlePhotoChange}
+              />
+
+              {errors.photo && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.photo.message}
+                </p>
+              )}
+            </div>
             {/* name */}
             <label className="label text-base font-semibold text-gray-700 my-1">
               Name
@@ -53,9 +135,12 @@ const Register = () => {
             <input
               type="text"
               className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
-              {...register("name")}
+              {...register("name", { required: true })}
               placeholder="Name"
             />
+            {errors.name?.type === "required" && (
+              <p className="text-red-500">Email is required</p>
+            )}
             {/* email */}
             <label className="label text-base font-semibold text-gray-700 my-2">
               Email
@@ -114,13 +199,16 @@ const Register = () => {
         </form>
         <p className="text-base mt-4">
           Already have an account?{" "}
-          <Link to={"/login"} className="text-[#aedb26]">
+          <Link state={location.state} to={"/login"} className="text-[#aedb26]">
             Login
           </Link>
         </p>
         <p className="text-center py-3">Or</p>
         {/* Google */}
-        <button className="btn bg-gray-200 rounded-lg text-base text-black border-0 w-full">
+        <button
+          onClick={handleSignUpWithGoogle}
+          className="btn bg-gray-200 rounded-lg text-base text-black border-0 w-full"
+        >
           <svg
             aria-label="Google logo"
             width="18"

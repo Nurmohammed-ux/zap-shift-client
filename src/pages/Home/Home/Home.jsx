@@ -11,7 +11,7 @@ import Reviews from "../HomeComponents/Reviews/Reviews";
 const Home = () => {
   return (
     <div>
-      <div className="md:px-12 pt-6">
+      <div className="md:px-12 pt-4">
         <Hero />
         {/* <Banner /> */}
         <HowItWorks />
