@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import rider from "../../assets/agent-pending.png";
-import serviceCenters from "../../data/service-centers.json"; // adjust path to where you place the JSON
+import { useLoaderData } from "react-router";
 
 const Rider = () => {
   const {
@@ -11,6 +11,7 @@ const Rider = () => {
     formState: { errors },
   } = useForm();
 
+  const serviceCenters = useLoaderData();
   const selectedRegion = watch("region");
 
   // Unique, ordered list of regions from the JSON (e.g. Dhaka, Chattogram, Sylhet...)
@@ -35,9 +36,9 @@ const Rider = () => {
       <h2 className="text-5xl text-center md:text-left text-secondary font-extrabold mb-4">
         Be a Rider
       </h2>
-      <p className="text-gray-500 font-normal mb-12.5">
+      <p className="text-gray-500 font-normal lg:max-w-2xl mb-12.5">
         Enjoy fast, reliable parcel delivery with real-time tracking and zero
-        hassle. From personal <br /> packages to business shipments — we deliver
+        hassle. From personal packages to business shipments — we deliver
         on time, every time.
       </p>
       <div className="lg:flex gap-50 border-t-2 border-dashed border-gray-200">
@@ -109,7 +110,7 @@ const Rider = () => {
                 </option>
                 {regions.map((region) => (
                   <option
-                    className="bg-gray-200 w-50 py-2 font-semibold"
+                    className="w-50 py-2 font-semibold"
                     key={region}
                     value={region}
                   >
@@ -138,7 +139,7 @@ const Rider = () => {
                 </option>
                 {districts.map((district) => (
                   <option
-                    className="bg-gray-200 w-50 py-2 font-semibold"
+                    className="w-50 py-2 font-semibold"
                     key={district}
                     value={district}
                   >
@@ -226,7 +227,7 @@ const Rider = () => {
 
               <button
                 type="submit"
-                className="btn bg-primary border-0 w-full mt-4 rounded-lg"
+                className="btn bg-primary w-full mt-4 rounded-lg"
               >
                 Submit
               </button>

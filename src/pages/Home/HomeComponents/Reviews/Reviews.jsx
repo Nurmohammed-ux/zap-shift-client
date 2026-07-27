@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Autoplay, EffectCoverflow, Pagination } from "swiper/modules";
+import { Autoplay, EffectCoverflow } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import customerTop from "../../../../assets/customer-top.png";
 import {
@@ -81,8 +81,7 @@ const Reviews = () => {
           modifier: 1,
           slideShadows: true,
         }}
-        pagination={true}
-        modules={[EffectCoverflow, Pagination, Autoplay]}
+        modules={[EffectCoverflow, Autoplay]}
         className="mySwiper"
         onSwiper={(swiper) => (swiperRef.current = swiper)}
         onSlideChange={(swiper) => setActive(swiper.realIndex)}

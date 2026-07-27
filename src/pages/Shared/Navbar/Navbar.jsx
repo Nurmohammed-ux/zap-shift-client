@@ -25,9 +25,6 @@ const Navbar = () => {
       <NavLink to={"/aboutUs"} className={getLinkClass}>
         About Us
       </NavLink>
-      <NavLink to={"/pricing"} className={getLinkClass}>
-        Pricing
-      </NavLink>
       <NavLink to={"/sendParcel"} className={getLinkClass}>
         Send Parcel
       </NavLink>
@@ -40,7 +37,7 @@ const Navbar = () => {
     <div className="px-2 md:px-14 py-4 lg:pt-6">
       <nav className="navbar bg-white px-18 py-5 md:px-6 rounded-xl flex flex-col md:flex-row  items-start  md:items-center gap-3 md:gap-0">
         <div className="navbar-start">
-          <div className="dropdown mr-2 border-0">
+          <div className="dropdown mr-2">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +84,7 @@ const Navbar = () => {
             </Link>
           )}
           <div className="flex items-center">
-            <Link className=" btn bg-primary border-0 rounded-xl">
+            <Link to={"/beARider"} className=" btn bg-primary rounded-xl">
               Be a rider
             </Link>
             <img className="h-9" src={arrow} alt="Arrow" />

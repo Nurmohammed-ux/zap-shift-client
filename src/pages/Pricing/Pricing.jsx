@@ -1,160 +1,134 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-
-// Simple, editable pricing rules — adjust to match your real rate card.
-const baseRate = {
-  document: { same_city: 60, outside_city: 80 },
-  "non-document": { same_city: 110, outside_city: 150 },
-};
-const FREE_WEIGHT_KG = 3; // weight included in the base rate
-const EXTRA_PER_KG = 40; // charge per kg above the free weight
+import { useLocation, useNavigate, Link } from "react-router";
+import Swal from "sweetalert2";
 
 const Pricing = () => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { parcelInfo, cost, sameCity } = location.state || {};
 
-  const [price, setPrice] = useState(50);
+  // Guard against someone landing here directly (refresh, bookmark, etc.)
+  // instead of arriving from the SendParcel submit — there's nothing to
+  // confirm without that data.
+  if (!parcelInfo) {
+    return (
+      <div className="bg-white rounded-2xl mx-2 mt-4 px-6 py-14 md:py-20 md:mx-14 md:px-25 text-center">
+        <h2 className="text-3xl font-extrabold text-secondary mb-4">
+          No parcel to review
+        </h2>
+        <p className="text-gray-500 mb-8">
+          Please fill out the parcel form first.
+        </p>
+        <Link
+          to="/sendParcel"
+          className="btn bg-primary font-semibold px-10 py-2 rounded-lg"
+        >
+          Go to Send A Parcel
+        </Link>
+      </div>
+    );
+  }
 
-  const calculatePrice = (data) => {
-    const base = baseRate[data.parcelType][data.destination];
-    const weight = Number(data.weight) || 0;
-    const extraWeight = Math.max(0, weight - FREE_WEIGHT_KG);
-    const total = base + extraWeight * EXTRA_PER_KG;
-    setPrice(total);
-  };
+  const handleConfirm = async () => {
+    const result = await Swal.fire({
+      title: "Confirm this booking?",
+      html: `You're about to book a <b>${parcelInfo.parcelType}</b> parcel for <b>${cost} Tk</b>.`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, confirm",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#CAEB66",
+    });
 
-  const handleReset = () => {
-    reset();
-    setPrice(50);
+    if (!result.isConfirmed) return;
+
+    // No backend wired up yet — this is where you'd POST `parcelInfo`
+    // + `cost` to your API before showing the success alert.
+    await Swal.fire({
+      title: "Booking Confirmed!",
+      text: "Your parcel has been booked successfully.",
+      icon: "success",
+      confirmButtonColor: "#CAEB66",
+      customClass: {
+        confirmButton: "text-black font-semibold",
+      },
+    });
+
+    navigate("/");
   };
 
   return (
-    <div className="bg-white rounded-3xl mx-2 mt-4 px-6 py-14 md:py-20 md:mx-14 md:px-25">
-      {/* Header */}
+    <div className="bg-white rounded-2xl mx-2 mt-4 px-6 py-14 md:py-20 md:mx-14 md:px-25">
       <h2 className="text-4xl md:text-5xl font-extrabold text-secondary">
-        Pricing Calculator
+        Confirm Your Booking Price
       </h2>
       <p className="text-gray-500 text-base mt-5">
-        Enjoy fast, reliable parcel delivery with real-time tracking and zero
-        hassle. From personal <br /> packages to business shipments — we deliver on
-        time, every time.
+        Review the details below before confirming your parcel booking.
       </p>
 
       <div className="border-t border-dashed border-gray-200 my-10" />
 
-      <h3 className="text-2xl font-bold text-secondary text-center mb-10">
-        Calculate Your Cost
-      </h3>
-
-      <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-10 lg:gap-50">
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit(calculatePrice)}
-          className="w-full max-w-lg"
-        >
-          {/* Parcel type */}
-          <label className="label text-sm font-semibold text-gray-700 mb-1">
-            Parcel type
-          </label>
-          <select
-            className="select select-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
-            defaultValue=""
-            {...register("parcelType", { required: true })}
-          >
-            <option value="" className="hidden" disabled>
-              Select Parcel type
-            </option>
-            <option
-              className="bg-gray-200 w-50 pt-3 font-semibold"
-              value="document"
-            >
-              Document
-            </option>
-            <option
-              className="bg-gray-200 w-50 pb-2 font-semibold"
-              value="non-document"
-            >
-              Non-Document
-            </option>
-          </select>
-          {errors.parcelType && (
-            <p className="text-red-500 text-sm mt-1">Parcel type is required</p>
-          )}
-
-          {/* Delivery destination */}
-          <label className="label text-sm font-semibold text-gray-700 mt-4 mb-1">
-            Delivery Destination
-          </label>
-          <select
-            className="select select-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
-            defaultValue=""
-            {...register("destination", { required: true })}
-          >
-            <option value="" className="hidden" disabled>
-              Select Delivery Destination
-            </option>
-            <option
-              className="bg-gray-200 w-50 pt-3 font-semibold"
-              value="same_city"
-            >
-              Inside City
-            </option>
-            <option
-              className="bg-gray-200 w-50 pb-3 font-semibold"
-              value="outside_city"
-            >
-              Outside City
-            </option>
-          </select>
-          {errors.destination && (
-            <p className="text-red-500 text-sm mt-1">
-              Delivery destination is required
+      <div className="flex flex-col lg:flex-row justify-center gap-10 lg:gap-24">
+        {/* Summary */}
+        <div className="w-full max-w-lg space-y-6">
+          <div>
+            <h5 className="text-[18px] font-extrabold text-secondary mb-2">
+              Parcel
+            </h5>
+            <p className="text-gray-700">
+              <span className="font-semibold">{parcelInfo.parcelName}</span> —{" "}
+              {parcelInfo.parcelType}
+              {parcelInfo.parcelType === "non-document" &&
+                parcelInfo.parcelWeight &&
+                ` (${parcelInfo.parcelWeight} kg)`}
             </p>
-          )}
+            <p className="text-gray-500 text-sm">
+              {sameCity ? "Within the same region" : "Cross-region delivery"}
+            </p>
+          </div>
 
-          {/* Weight */}
-          <label className="label text-sm font-semibold text-gray-700 mt-4 mb-1">
-            Weight (KG)
-          </label>
-          <input
-            type="number"
-            step="0.1"
-            min="0"
-            placeholder="Weight in KG"
-            className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
-            {...register("weight", { required: true, min: 0 })}
-          />
-          {errors.weight && (
-            <p className="text-red-500 text-sm mt-1">Weight is required</p>
-          )}
+          <div>
+            <h5 className="text-[18px] font-extrabold text-secondary mb-2">
+              Sender
+            </h5>
+            <p className="text-gray-700">{parcelInfo.senderName}</p>
+            <p className="text-gray-500 text-sm">{parcelInfo.senderPhone}</p>
+            <p className="text-gray-500 text-sm">{parcelInfo.senderAddress}</p>
+          </div>
 
-          {/* Buttons */}
-          <div className="flex items-center gap-4 mt-6">
+          <div>
+            <h5 className="text-[18px] font-extrabold text-secondary mb-2">
+              Receiver
+            </h5>
+            <p className="text-gray-700">{parcelInfo.receiverName}</p>
+            <p className="text-gray-500 text-sm">{parcelInfo.receiverPhone}</p>
+            <p className="text-gray-500 text-sm">
+              {parcelInfo.receiverAddress}
+            </p>
+          </div>
+        </div>
+
+        {/* Price + confirm */}
+        <div className="flex flex-col items-center justify-center gap-6">
+          <p className="text-secondary font-semibold">Estimated Cost</p>
+          <p className="text-6xl md:text-7xl font-extrabold text-secondary">
+            {cost} Tk
+          </p>
+          <div className="flex gap-4">
             <button
               type="button"
-              onClick={handleReset}
+              onClick={() => navigate(-1)}
               className="btn bg-white border border-primary/40 text-secondary rounded-lg px-6 hover:bg-gray-50"
             >
-              Reset
+              Edit Details
             </button>
             <button
-              type="submit"
-              className="btn bg-primary border-0 text-secondary font-semibold rounded-lg flex-1 hover:brightness-95"
+              type="button"
+              onClick={handleConfirm}
+              className="btn bg-primary font-semibold px-8 rounded-lg hover:brightness-95"
             >
-              Calculate
+              Confirm Booking
             </button>
           </div>
-        </form>
-
-        {/* Result */}
-        <div className="flex items-center justify-center lg:translate-y-20">
-          <p className="text-6xl md:text-7xl font-extrabold text-secondary">
-            {price} Tk
-          </p>
         </div>
       </div>
     </div>

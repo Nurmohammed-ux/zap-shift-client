@@ -42,10 +42,15 @@ const router = createBrowserRouter([
             <Rider />
           </PrivateRoute>
         ),
+        loader: () => fetch("/service-centers.json"),
       },
       {
         path: "/pricing",
-        element: <Pricing />,
+        element: (
+          <PrivateRoute>
+            <Pricing />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/sendParcel",
@@ -54,6 +59,7 @@ const router = createBrowserRouter([
             <SendParcel />
           </PrivateRoute>
         ),
+        loader: () => fetch("/service-centers.json"),
       },
       {
         path: "*",

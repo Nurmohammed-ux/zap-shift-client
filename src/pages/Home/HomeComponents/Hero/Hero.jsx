@@ -30,7 +30,7 @@ const Hero = () => {
               />
               <div className="absolute left-4 sm:left-10 lg:left-25 bottom-0 md:bottom-6 lg:bottom-20 flex flex-nowrap items-center gap-2 sm:gap-4">
                 <div className="flex items-center">
-                  <Link className="btn btn-xs sm:btn-sm md:btn-md text-[10px] sm:text-sm bg-primary border-0 rounded-xl pt-1 px-3 sm:px-6">
+                  <Link className="btn btn-xs sm:btn-sm md:btn-md text-[10px] sm:text-sm bg-primary rounded-xl pt-1 px-3 sm:px-6">
                     Track Your Parcel
                   </Link>
                   <img className="h-5 sm:h-7 md:h-9" src={arrow} alt="Arrow" />
@@ -52,7 +52,7 @@ const Hero = () => {
               />
               <div className="absolute left-4 sm:left-10 lg:left-25 bottom-2 md:bottom-6 lg:bottom-20 flex flex-nowrap items-center gap-2 sm:gap-4">
                 <div className="flex items-center">
-                  <Link className="btn btn-xs sm:btn-sm md:btn-md text-[10px] sm:text-sm bg-primary border-0 rounded-xl pt-1 px-3 sm:px-6">
+                  <Link className="btn btn-xs sm:btn-sm md:btn-md text-[10px] sm:text-sm bg-primary rounded-xl pt-1 px-3 sm:px-6">
                     Track Your Parcel
                   </Link>
                   <img className="h-5 sm:h-7 md:h-9" src={arrow} alt="Arrow" />
@@ -74,7 +74,7 @@ const Hero = () => {
               />
               <div className="absolute left-4 sm:left-10 lg:left-25 bottom-2 md:bottom-6 lg:bottom-20 flex flex-nowrap items-center gap-2 sm:gap-4">
                 <div className="flex items-center">
-                  <Link className="btn btn-xs sm:btn-sm md:btn-md text-[10px] sm:text-sm bg-primary border-0 rounded-xl pt-1 px-3 sm:px-6">
+                  <Link className="btn btn-xs sm:btn-sm md:btn-md text-[10px] sm:text-sm bg-primary rounded-xl pt-1 px-3 sm:px-6">
                     Track Your Parcel
                   </Link>
                   <img className="h-5 sm:h-7 md:h-9" src={arrow} alt="Arrow" />

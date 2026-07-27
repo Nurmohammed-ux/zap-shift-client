@@ -1,34 +1,120 @@
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { useLoaderData, useNavigate } from "react-router";
 
-const divisions = [
-  "Dhaka",
-  "Chattogram",
-  "Khulna",
-  "Rajshahi",
-  "Barisal",
-  "Sylhet",
-  "Rangpur",
-  "Mymensingh",
-];
+const FREE_WEIGHT_KG = 3;  
+const EXTRA_PER_KG = 40; 
+const OUTSIDE_CITY_OVERWEIGHT_SURCHARGE = 40; 
+
+const BASE_RATE = {
+  document: { sameCity: 60, outsideCity: 80 },
+  "non-document": { sameCity: 110, outsideCity: 150 },
+};
+
+function calculateParcelCost({ parcelType, weight, sameCity }) {
+  const rate = BASE_RATE[parcelType];
+  if (!rate) return 0;
+
+  const base = sameCity ? rate.sameCity : rate.outsideCity;
+
+  if (parcelType === "document") {
+    return base;
+  }
+
+  const numericWeight = Number(weight) || 0;
+  const overWeight = Math.max(0, numericWeight - FREE_WEIGHT_KG);
+
+  if (overWeight === 0) {
+    return base;
+  }
+
+  let cost = base + overWeight * EXTRA_PER_KG;
+  if (!sameCity) {
+    cost += OUTSIDE_CITY_OVERWEIGHT_SURCHARGE;
+  }
+  return cost;
+}
 
 const SendParcel = () => {
+  const navigate = useNavigate();
   const {
     register,
-    watch,
+    control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: { parcelType: "document" },
   });
 
-  const parcelType = watch("parcelType");
+  const parcelType = useWatch({ control, name: "parcelType" });
+  const selectedRegion = useWatch({ control, name: "senderRegion" });
+  const selectedDistrict = useWatch({ control, name: "senderDistrict" });
+  const selectedReceiverRegion = useWatch({ control, name: "receiverRegion" });
+  const selectedReceiverDistrict = useWatch({
+    control,
+    name: "receiverDistrict",
+  });
+
+  const serviceCenters = useLoaderData();
+  const regions = [...new Set(serviceCenters.map((center) => center.region))];
+
+  const senderDistricts = serviceCenters
+    .filter((center) => center.region === selectedRegion)
+    .map((center) => center.district);
+
+  const receiverDistricts = serviceCenters
+    .filter((center) => center.region === selectedReceiverRegion)
+    .map((center) => center.district);
+
+  // Reset the dependent district whenever its region changes.
+  const handleSenderRegionChange = () => {
+    setValue("senderDistrict", "");
+  };
+  const handleReceiverRegionChange = () => {
+    setValue("receiverDistrict", "");
+  };
+
+  // Auto-fill address once both region + district are picked.
+  // Only re-runs when region/district change, so manual edits
+  // to the address afterwards are left alone.
+  useEffect(() => {
+    if (selectedRegion && selectedDistrict) {
+      setValue("senderAddress", `${selectedDistrict}, ${selectedRegion}`);
+    }
+    if (selectedReceiverRegion && selectedReceiverDistrict) {
+      setValue(
+        "receiverAddress",
+        `${selectedReceiverDistrict}, ${selectedReceiverRegion}`,
+      );
+    }
+  }, [
+    selectedRegion,
+    selectedDistrict,
+    setValue,
+    selectedReceiverRegion,
+    selectedReceiverDistrict,
+  ]);
 
   const handleSendParcel = (data) => {
-    console.log("after sending parcel", data);
+    const sameCity = data.senderRegion === data.receiverRegion;
+    const cost = calculateParcelCost({
+      parcelType: data.parcelType,
+      weight: data.parcelWeight,
+      sameCity,
+    });
+
+    navigate("/pricing", {
+      state: {
+        parcelInfo: data,
+        cost,
+        sameCity,
+      },
+    });
   };
 
   return (
-    <div className="bg-white rounded-3xl mx-2 mt-4 px-6 py-14 md:py-20 md:mx-14 md:px-25">
+    <div className="bg-white rounded-2xl mx-2 mt-4 px-6 py-14 md:py-20 md:mx-14 md:px-25">
       <h2 className="text-4xl md:text-5xl font-extrabold text-secondary">
         Send A Parcel
       </h2>
@@ -38,29 +124,29 @@ const SendParcel = () => {
       <div className="border-t border-dashed border-gray-200 my-7.5" />
 
       <form onSubmit={handleSubmit(handleSendParcel)}>
-        <div className="flex gap-5 mb-4">
-          <label className="label cursor-pointer flex gap-2 font-medium">
+        <div className="flex gap-8 mb-4">
+          <label className="label cursor-pointer flex gap-2 font-semibold text-secondary">
             <input
               type="radio"
               value="document"
-              className="radio radio-primary"
+              className="radio radio-primary radio-sm"
               {...register("parcelType", { required: true })}
             />
             <span className="label-text">Document</span>
           </label>
 
-          <label className="label cursor-pointer flex gap-2 font-medium">
+          <label className="label cursor-pointer flex gap-2 font-semibold text-secondary">
             <input
               type="radio"
               value="non-document"
-              className="radio radio-primary"
+              className="radio radio-primary radio-sm"
               {...register("parcelType", { required: true })}
             />
             <span className="label-text">Non-document</span>
           </label>
         </div>
 
-        <div className="flex gap-7.5">
+        <div className="flex flex-col md:flex-row gap-2 md:gap-10">
           <div className="flex-1">
             {/* Parcel Name */}
             <label className="label text-sm font-semibold text-gray-700 mt-4 mb-1">
@@ -108,7 +194,7 @@ const SendParcel = () => {
 
         <div className="border-t border-dashed border-gray-200 my-7.5" />
 
-        <div className="flex gap-10">
+        <div className="flex flex-col md:flex-row gap-10">
           <div className="flex-1">
             <h5 className="text-[18px] font-extrabold text-secondary">
               Sender Details
@@ -130,21 +216,21 @@ const SendParcel = () => {
                 {errors.senderName.message}
               </p>
             )}
-            {/* Sender's Address */}
+            {/* Sender's Email */}
             <label className="label text-sm font-semibold text-gray-700 mt-4 mb-2">
-              Address
+              Sender Email
             </label>
             <input
-              type="text"
-              placeholder="Address"
+              type="email"
+              placeholder="Sender Email"
               className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
-              {...register("senderAddress", {
-                required: "Address is required",
+              {...register("senderEmail", {
+                required: "Sender Email is required",
               })}
             />
-            {errors.senderAddress && (
+            {errors.senderEmail && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.senderAddress.message}
+                {errors.senderEmail.message}
               </p>
             )}
             {/* Sender Phone No */}
@@ -157,11 +243,45 @@ const SendParcel = () => {
               className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
               {...register("senderPhone", {
                 required: "Phone number is required",
+                pattern: {
+                  value: /^01[3-9]\d{8}$/,
+                  message: "Enter a valid BD phone number",
+                },
               })}
             />
             {errors.senderPhone && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.senderPhone.message}
+              </p>
+            )}
+            {/* Your Region */}
+            <label className="label text-sm font-semibold text-gray-700 mt-4 mb-2">
+              Your Region
+            </label>
+            <select
+              defaultValue=""
+              className="select select-bordered border border-gray-200 rounded-lg w-full focus:outline-primary text-gray-400 font-normal"
+              {...register("senderRegion", {
+                required: "Please select a region",
+                onChange: handleSenderRegionChange,
+              })}
+            >
+              <option value="" className="hidden" disabled>
+                Select your Region
+              </option>
+              {regions.map((region) => (
+                <option
+                  className="w-50 text-black pt-3 font-semibold"
+                  key={region}
+                  value={region}
+                >
+                  {region}
+                </option>
+              ))}
+            </select>
+            {errors.senderRegion && (
+              <p className="text-error text-xs mt-1">
+                {errors.senderRegion.message}
               </p>
             )}
             {/* Your District */}
@@ -174,13 +294,14 @@ const SendParcel = () => {
               {...register("senderDistrict", {
                 required: "Please select a district",
               })}
+              disabled={!selectedRegion}
             >
               <option value="" className="hidden" disabled>
                 Select your District
               </option>
-              {divisions.map((division) => (
+              {senderDistricts.map((division) => (
                 <option
-                  className="bg-gray-200 w-50 text-black pt-3 font-semibold"
+                  className="w-50 text-black pt-3 font-semibold"
                   key={division}
                   value={division}
                 >
@@ -191,6 +312,23 @@ const SendParcel = () => {
             {errors.senderDistrict && (
               <p className="text-error text-xs mt-1">
                 {errors.senderDistrict.message}
+              </p>
+            )}
+            {/* Sender's Address */}
+            <label className="label text-sm font-semibold text-gray-700 mt-4 mb-2">
+              Address
+            </label>
+            <input
+              type="text"
+              placeholder="Address (auto-filled, editable)"
+              className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
+              {...register("senderAddress", {
+                required: "Address is required",
+              })}
+            />
+            {errors.senderAddress && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.senderAddress.message}
               </p>
             )}
             {/* Pickup Instruction */}
@@ -226,21 +364,21 @@ const SendParcel = () => {
                 {errors.receiverName.message}
               </p>
             )}
-            {/* Receiver's Address */}
+            {/* Receiver's Email */}
             <label className="label text-sm font-semibold text-gray-700 mt-4 mb-2">
-              Receiver Address
+              Receiver Email
             </label>
             <input
-              type="text"
-              placeholder="Receiver"
+              type="email"
+              placeholder="Receiver Email"
               className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
-              {...register("receiverAddress", {
-                required: "Address is required",
+              {...register("receiverEmail", {
+                required: "Receiver Email is required",
               })}
             />
-            {errors.receiverAddress && (
+            {errors.receiverEmail && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.receiverAddress.message}
+                {errors.receiverEmail.message}
               </p>
             )}
             {/* Receiver Phone No */}
@@ -264,6 +402,36 @@ const SendParcel = () => {
                 {errors.receiverPhone.message}
               </p>
             )}
+            {/* Receiver Region */}
+            <label className="label text-sm font-semibold text-gray-700 mt-4 mb-2">
+              Receiver Region
+            </label>
+            <select
+              defaultValue=""
+              className="select select-bordered border border-gray-200 rounded-lg w-full focus:outline-primary text-gray-400 font-normal"
+              {...register("receiverRegion", {
+                required: "Please select a region",
+                onChange: handleReceiverRegionChange,
+              })}
+            >
+              <option value="" className="hidden" disabled>
+                Select Receiver Region
+              </option>
+              {regions.map((region) => (
+                <option
+                  className="w-50 text-black pt-3 font-semibold"
+                  key={region}
+                  value={region}
+                >
+                  {region}
+                </option>
+              ))}
+            </select>
+            {errors.receiverRegion && (
+              <p className="text-error text-xs mt-1">
+                {errors.receiverRegion.message}
+              </p>
+            )}
             {/* Receiver District */}
             <label className="label text-sm font-semibold text-gray-700 mt-4 mb-2">
               Receiver District
@@ -274,13 +442,14 @@ const SendParcel = () => {
               {...register("receiverDistrict", {
                 required: "Please select a district",
               })}
+              disabled={!selectedReceiverRegion}
             >
               <option value="" className="hidden" disabled>
                 Select your District
               </option>
-              {divisions.map((division) => (
+              {receiverDistricts.map((division) => (
                 <option
-                  className="bg-gray-200 w-50 text-black pt-3 font-semibold"
+                  className="w-50 text-black pt-3 font-semibold"
                   key={division}
                   value={division}
                 >
@@ -293,20 +462,40 @@ const SendParcel = () => {
                 {errors.receiverDistrict.message}
               </p>
             )}
+            {/* Receiver's Address */}
+            <label className="label text-sm font-semibold text-gray-700 mt-4 mb-2">
+              Receiver Address
+            </label>
+            <input
+              type="text"
+              placeholder="Address (auto-filled, editable)"
+              className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
+              {...register("receiverAddress", {
+                required: "Address is required",
+              })}
+            />
+            {errors.receiverAddress && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.receiverAddress.message}
+              </p>
+            )}
             {/* Delivery Instruction */}
             <label className="label text-sm font-semibold text-gray-700 mt-4 mb-2">
               Delivery Instruction
             </label>
             <textarea
               rows={3}
-              placeholder="Pickup Instruction"
+              placeholder="Delivery Instruction"
               className="textarea textarea-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
               {...register("deliveryInstruction")}
             />
           </div>
         </div>
         <p className="my-12.5">* PickUp Time 4pm-7pm Approx.</p>
-        <button className="btn bg-primary border-0 font-semibold px-6 rounded-lg">
+        <button
+          type="submit"
+          className="btn bg-primary font-semibold px-10 py-2 rounded-lg"
+        >
           Proceed to Confirm Booking
         </button>
       </form>
@@ -315,3 +504,39 @@ const SendParcel = () => {
 };
 
 export default SendParcel;
+
+// alternate method
+// const districtsByRegion = (region) => {
+//   const regionDistricts = serviceCenters.filter((c) => c.region === region);
+//   const districts = regionDistricts.map((c) => c.district);
+//   return districts;
+// };
+// const handleSendParcel = (data) => {
+//     console.log("after sending parcel", data);
+
+//     let cost = 0;
+//     const sameCity = data.senderRegion === data.receiverRegion;
+//     const isDocument = data.parcelType === "document";
+//     const weight = parseFloat(data.parcelWeight) || 0;
+
+//     if (isDocument) {
+//       cost = sameCity ? 60 : 80;
+//     } else {
+//       // Base cost for non-document up to 3kg
+//       const baseCost = sameCity ? 110 : 150;
+
+//       if (weight <= 3) {
+//         cost = baseCost;
+//       } else {
+//         const extraWeight = weight - 3;
+//         if (sameCity) {
+//           cost = baseCost + extraWeight * 40;
+//         } else {
+//           cost = baseCost + extraWeight * 40 + 40;
+//         }
+//       }
+//     }
+//     console.log(cost);
+
+//     return cost;
+//   };
