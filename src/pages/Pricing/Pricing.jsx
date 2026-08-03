@@ -1,10 +1,13 @@
 import { useLocation, useNavigate, Link } from "react-router";
 import Swal from "sweetalert2";
+import UseAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Pricing = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { parcelInfo, cost, sameCity } = location.state || {};
+  const axiosSecure = UseAxiosSecure();
+  // console.log(parcelInfo);
 
   // Guard against someone landing here directly (refresh, bookmark, etc.)
   // instead of arriving from the SendParcel submit — there's nothing to
@@ -41,8 +44,17 @@ const Pricing = () => {
 
     if (!result.isConfirmed) return;
 
-    // No backend wired up yet — this is where you'd POST `parcelInfo`
-    // + `cost` to your API before showing the success alert.
+    // 1. Create a brand NEW object with all parcelInfo data + the cost
+    const finalParcelData = {
+      ...parcelInfo,
+      cost: cost,
+    };
+
+    // 2. Send the NEW object to the database
+    axiosSecure.post("/parcels", finalParcelData).then((result) => {
+      console.log(result.data);
+    });
+
     await Swal.fire({
       title: "Booking Confirmed!",
       text: "Your parcel has been booked successfully.",
@@ -53,7 +65,7 @@ const Pricing = () => {
       },
     });
 
-    navigate("/");
+    navigate("/dashboard/my-parcels");
   };
 
   return (
@@ -111,7 +123,7 @@ const Pricing = () => {
         <div className="flex flex-col items-center justify-center gap-6">
           <p className="text-secondary font-semibold">Estimated Cost</p>
           <p className="text-6xl md:text-7xl font-extrabold text-secondary">
-            {cost} Tk
+            $ {cost}{" "}
           </p>
           <div className="flex gap-4">
             <button

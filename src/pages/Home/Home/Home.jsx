@@ -7,13 +7,11 @@ import MerchantCTA from "../HomeComponents/MerchantCTA/MerchantCTA";
 // import Testimonials from "../HomeComponents/Testimonials/Testimonials";
 import FAQ from "../HomeComponents/FAQS/FAQ";
 import Reviews from "../HomeComponents/Reviews/Reviews";
-// import Banner from "../HomeComponents/Banner/Banner";
 const Home = () => {
   return (
     <div>
       <div className="md:px-12 pt-4">
         <Hero />
-        {/* <Banner /> */}
         <HowItWorks />
         <OurServices />
         <ClientLogos />

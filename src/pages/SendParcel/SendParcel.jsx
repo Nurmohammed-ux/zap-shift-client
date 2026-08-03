@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useLoaderData, useNavigate } from "react-router";
+import useAuth from "../../hooks/useAuth";
 
-const FREE_WEIGHT_KG = 3;  
-const EXTRA_PER_KG = 40; 
-const OUTSIDE_CITY_OVERWEIGHT_SURCHARGE = 40; 
+const FREE_WEIGHT_KG = 3;
+const EXTRA_PER_KG = 40;
+const OUTSIDE_CITY_OVERWEIGHT_SURCHARGE = 40;
 
 const BASE_RATE = {
   document: { sameCity: 60, outsideCity: 80 },
@@ -46,6 +47,8 @@ const SendParcel = () => {
   } = useForm({
     defaultValues: { parcelType: "document" },
   });
+
+  const { user } = useAuth();
 
   const parcelType = useWatch({ control, name: "parcelType" });
   const selectedRegion = useWatch({ control, name: "senderRegion" });
@@ -206,6 +209,7 @@ const SendParcel = () => {
             <input
               type="text"
               placeholder="Sender Name"
+              defaultValue={user?.displayName}
               className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
               {...register("senderName", {
                 required: "Sender name is required",
@@ -223,6 +227,7 @@ const SendParcel = () => {
             <input
               type="email"
               placeholder="Sender Email"
+              defaultValue={user?.email}
               className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
               {...register("senderEmail", {
                 required: "Sender Email is required",

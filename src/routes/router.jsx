@@ -11,6 +11,11 @@ import PrivateRoute from "../routes/PrivateRoute";
 import Rider from "../pages/Rider/Rider";
 import Pricing from "../pages/Pricing/Pricing";
 import SendParcel from "../pages/SendParcel/SendParcel";
+import DashboardLayout from "../layouts/DashboardLayout";
+import MyParcels from "../pages/Dashboard/MyParcels/MyParcels";
+import Payment from "../pages/Dashboard/Payment/Payment";
+import PaymentSuccess from "../pages/Dashboard/Payment/PaymentSuccess";
+import PaymentCancelled from "../pages/Dashboard/Payment/PaymentCancelled";
 
 const router = createBrowserRouter([
   {
@@ -27,16 +32,16 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/coverage",
+        path: "coverage",
         element: <Coverage />,
         loader: () => fetch("/service-centers.json"),
       },
       {
-        path: "/aboutUs",
+        path: "aboutUs",
         element: <AboutUs />,
       },
       {
-        path: "/beARider",
+        path: "beARider",
         element: (
           <PrivateRoute>
             <Rider />
@@ -45,7 +50,7 @@ const router = createBrowserRouter([
         loader: () => fetch("/service-centers.json"),
       },
       {
-        path: "/pricing",
+        path: "pricing",
         element: (
           <PrivateRoute>
             <Pricing />
@@ -53,7 +58,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/sendParcel",
+        path: "sendParcel",
         element: (
           <PrivateRoute>
             <SendParcel />
@@ -72,14 +77,40 @@ const router = createBrowserRouter([
     element: <AuthLayout />,
     children: [
       {
-        path: "/login",
+        path: "login",
         element: <Login />,
       },
       {
-        path: "/register",
+        path: "register",
         element: <Register />,
       },
     ],
+  },
+  {
+    path: "dashboard",
+    element: (
+      <PrivateRoute>
+        <DashboardLayout />
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: "my-parcels",
+        element: <MyParcels />
+      },
+      {
+        path: "payment/:parcelId",
+        element: <Payment />
+      },
+      {
+        path: "payment-success",
+        element: <PaymentSuccess />
+      },
+      {
+        path: "payment-cancelled",
+        element: <PaymentCancelled />
+      }
+    ]
   },
 ]);
 export default router;
