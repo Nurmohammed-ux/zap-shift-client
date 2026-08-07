@@ -165,7 +165,7 @@ const ParcelTable = ({ parcels = [], refetch }) => {
                   </td>
                   <td>
                     {parcel.paymentStatus === "paid" ? (
-                      <span className="text-green-600 font-medium">Paid</span>
+                      <span className="text-green-600 bg-green-200 py-1 px-3 rounded-full font-medium">Paid</span>
                     ) : (
                       // <Link to={`/dashboard/payment/${parcel._id}`}>
                       //   <button className="btn btn-xs btn-primary text-black">

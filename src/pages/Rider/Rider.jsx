@@ -1,6 +1,10 @@
 import { useForm } from "react-hook-form";
 import rider from "../../assets/agent-pending.png";
-import { useLoaderData } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
+import { useEffect } from "react";
+import UseAuth from "../../hooks/useAuth";
+import UseAxiosSecure from "../../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
 
 const Rider = () => {
   const {
@@ -11,8 +15,12 @@ const Rider = () => {
     formState: { errors },
   } = useForm();
 
+  const { user } = UseAuth();
+  const axiosSecure = UseAxiosSecure();
   const serviceCenters = useLoaderData();
   const selectedRegion = watch("region");
+  const selectedDistrict = watch("district");
+  const navigate= useNavigate();
 
   // Unique, ordered list of regions from the JSON (e.g. Dhaka, Chattogram, Sylhet...)
   const regions = [...new Set(serviceCenters.map((center) => center.region))];
@@ -27,8 +35,38 @@ const Rider = () => {
     setValue("district", ""); // reset district whenever region changes
   };
 
+  useEffect(() => {
+    if (selectedRegion && selectedDistrict) {
+      setValue("yourAddress", `${selectedDistrict}, ${selectedRegion}`);
+    }
+  }, [selectedDistrict, selectedRegion, setValue]);
+
   const handleRiderSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
+
+    axiosSecure.post("/riders", data).then((res) => {
+      // console.log("inside be a rider", res.data);
+      if (res.data.insertedId) {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Application Submitted Successfully!",
+          text: "We have received your details and will reach out to you soon.",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          background: "#ffffff",
+          color: "#1f2937",
+          customClass: {
+            popup: "rounded-2xl shadow-xl border border-gray-100 p-6",
+            title: "text-xl font-extrabold text-secondary tracking-wide",
+            htmlContainer: "text-gray-500 text-sm mt-1",
+            icon: "scale-90",
+          },
+        });
+        navigate("/")
+      }
+    });
   };
 
   return (
@@ -38,8 +76,8 @@ const Rider = () => {
       </h2>
       <p className="text-gray-500 font-normal lg:max-w-2xl mb-12.5">
         Enjoy fast, reliable parcel delivery with real-time tracking and zero
-        hassle. From personal packages to business shipments — we deliver
-        on time, every time.
+        hassle. From personal packages to business shipments — we deliver on
+        time, every time.
       </p>
       <div className="lg:flex gap-50 border-t-2 border-dashed border-gray-200">
         <div className="card w-full mt-4 flex-1 shrink-0 ">
@@ -57,6 +95,7 @@ const Rider = () => {
               </label>
               <input
                 type="text"
+                defaultValue={user?.displayName}
                 className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
                 {...register("name", { required: true })}
                 placeholder="Your Name"
@@ -87,6 +126,7 @@ const Rider = () => {
               </label>
               <input
                 type="email"
+                defaultValue={user?.email}
                 className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
                 {...register("email", { required: true })}
                 placeholder="Your Email"
@@ -149,6 +189,24 @@ const Rider = () => {
               </select>
               {errors.district?.type === "required" && (
                 <p className="text-red-500">District is required</p>
+              )}
+
+              {/* Sender's Address */}
+              <label className="label text-sm font-semibold text-gray-700 mt-4 mb-2">
+                Address
+              </label>
+              <input
+                type="text"
+                placeholder="Address (auto-filled, editable)"
+                className="input input-bordered border border-gray-200 rounded-lg w-full focus:outline-primary"
+                {...register("yourAddress", {
+                  required: "Address is required",
+                })}
+              />
+              {errors.yourAddress && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.yourAddress.message}
+                </p>
               )}
 
               {/* NID No */}

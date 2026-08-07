@@ -2,13 +2,14 @@ import { Link, NavLink, Outlet } from "react-router";
 import Logo from "../componenets/Logo/Logo";
 import logoImg from "../assets/logo.png";
 import dashImg from "../assets/Group.png";
-import { LuDoorOpen } from "react-icons/lu";
 import { TbFileInvoice } from "react-icons/tb";
 import { IoStorefrontOutline, IoPricetagsOutline } from "react-icons/io5";
 import { PiMapPinAreaDuotone } from "react-icons/pi";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { IoMdHelpCircleOutline, IoIosLogOut } from "react-icons/io";
 import DashboardNavbar from "../pages/Shared/DashboardNavbar/DashboardNavbar";
+import UseAuth from "../hooks/useAuth";
+import { FaMotorcycle } from "react-icons/fa6";
 
 const linkBaseStyle =
   "is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-3 w-full text-base px-3 py-2";
@@ -21,6 +22,16 @@ const getLinkClass = ({ isActive }) =>
   }`;
 
 const DashboardLayout = () => {
+  const { logOut } = UseAuth();
+
+  const handleLogout = () => {
+    logOut()
+      .then(() => {})
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
+
   return (
     <div className="container mx-auto">
       <div className="drawer lg:drawer-open">
@@ -117,30 +128,30 @@ const DashboardLayout = () => {
                 </NavLink>
               </li>
 
-              {/* Deliveries NavLink */}
+              {/* Riders NavLink */}
               <li>
                 <NavLink
-                  to={"/dashboard/deliveries"}
+                  to={"/dashboard/approve-riders"}
                   className={getLinkClass}
-                  data-tip="Deliveries"
+                  data-tip="Approve Riders"
                 >
-                  <LuDoorOpen className="my-1.5 size-5 -ml-px shrink-0" />
+                  <FaMotorcycle className="my-1.5 size-5 -ml-px shrink-0" />
                   <span className="is-drawer-close:hidden truncate">
-                    Deliveries
+                   Approve Riders
                   </span>
                 </NavLink>
               </li>
 
-              {/* Invoices NavLink */}
+              {/* Payment History NavLink */}
               <li>
                 <NavLink
-                  to={"/dashboard/invoices"}
+                  to={"/dashboard/payment-history"}
                   className={getLinkClass}
-                  data-tip="Invoices"
+                  data-tip="Payment History"
                 >
                   <TbFileInvoice className="my-1.5 size-5 -ml-0.5 shrink-0" />
                   <span className="is-drawer-close:hidden truncate">
-                    Invoices
+                    Payment History
                   </span>
                 </NavLink>
               </li>
@@ -162,7 +173,7 @@ const DashboardLayout = () => {
               {/* Pricing Plan NavLink */}
               <li>
                 <NavLink
-                  to={"/dashboard/pricing-plan"}
+                  to={"/services"}
                   className={getLinkClass}
                   data-tip="Pricing Plan"
                 >
@@ -257,8 +268,8 @@ const DashboardLayout = () => {
 
               {/* LogOut NavLink styled  */}
               <li>
-                <NavLink
-                  to={"/dashboard/logOut"}
+                <button
+                  onClick={handleLogout}
                   className={`${linkBaseStyle} text-black font-light hover:text-gray-900`}
                   data-tip="LogOut"
                 >
@@ -266,7 +277,7 @@ const DashboardLayout = () => {
                   <span className="is-drawer-close:hidden truncate">
                     LogOut
                   </span>
-                </NavLink>
+                </button>
               </li>
             </ul>
           </div>

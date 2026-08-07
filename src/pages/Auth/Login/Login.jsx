@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router";
 import useAuth from "../../../hooks/useAuth";
+import UseAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,16 +16,17 @@ const Login = () => {
   const { signInUser, signInWithGoogle, resetPassword } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const axiosSecure = UseAxiosSecure();
 
   const handleLogin = (data) => {
-    console.log("after login", data);
+    // console.log("after login", data);
     const email = data.email;
     const password = data.password;
 
     console.log(email, password);
     signInUser(email, password)
-      .then((result) => {
-        console.log(result.user);
+      .then(() => {
+        // console.log(result.user);
         navigate(location?.state || "/");
       })
       .catch((error) => {
@@ -36,7 +38,19 @@ const Login = () => {
   const handleLoginWithGoogle = () => {
     signInWithGoogle()
       .then((result) => {
-        console.log(result.user);
+        
+        // create user in database
+        const userInfo = {
+          displayName: result.user.displayName,
+          email: result.user.email,
+          photoURL: result.user.photoURL,
+        };
+
+        axiosSecure
+          .post("/users", userInfo)
+          .then((res) =>
+            console.log("user data has been stored in db", res.data),
+          );
         navigate(location?.state || "/");
       })
       .catch((error) => {

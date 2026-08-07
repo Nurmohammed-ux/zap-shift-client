@@ -16,6 +16,9 @@ import MyParcels from "../pages/Dashboard/MyParcels/MyParcels";
 import Payment from "../pages/Dashboard/Payment/Payment";
 import PaymentSuccess from "../pages/Dashboard/Payment/PaymentSuccess";
 import PaymentCancelled from "../pages/Dashboard/Payment/PaymentCancelled";
+import Services from "../pages/Services/Services";
+import PaymentHistory from "../pages/Dashboard/PaymentHistory/PaymentHistory";
+import ApprovedRider from "../pages/Dashboard/ApprovedRider/ApprovedRider";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +70,10 @@ const router = createBrowserRouter([
         loader: () => fetch("/service-centers.json"),
       },
       {
+        path: "services",
+        element: <Services />
+      },
+      {
         path: "*",
         element: <Error />,
       },
@@ -96,21 +103,29 @@ const router = createBrowserRouter([
     children: [
       {
         path: "my-parcels",
-        element: <MyParcels />
+        element: <MyParcels />,
       },
       {
         path: "payment/:parcelId",
-        element: <Payment />
+        element: <Payment />,
       },
       {
         path: "payment-success",
-        element: <PaymentSuccess />
+        element: <PaymentSuccess />,
       },
       {
         path: "payment-cancelled",
-        element: <PaymentCancelled />
+        element: <PaymentCancelled />,
+      },
+      {
+        path: "payment-history",
+        element: <PaymentHistory />
+      },
+      {
+        path: "approve-riders",
+        element: <ApprovedRider />
       }
-    ]
+    ],
   },
 ]);
 export default router;

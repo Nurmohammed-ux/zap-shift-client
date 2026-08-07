@@ -4,6 +4,7 @@ import { FaEye, FaEyeSlash, FaUpload, FaUser } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router";
 import UseAuth from "../../../hooks/useAuth";
 import axios from "axios";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +17,7 @@ const Register = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [preview, setPreview] = useState(null);
+  const axiosSecure = useAxiosSecure();
   // console.log(user);
 
   const { onChange: onPhotoChange, ...photoRegisterRest } = register("photo", {
@@ -38,9 +40,7 @@ const Register = () => {
     const profileImg = data.photo[0];
 
     createUser(email, password)
-      .then((result) => {
-        console.log(result.user);
-
+      .then(() => {
         // store image in method formdata
         const formData = new FormData();
         formData.append("image", profileImg);
@@ -48,10 +48,23 @@ const Register = () => {
         const imgbbApi = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`;
         axios.post(imgbbApi, formData).then((res) => {
           // console.log("after image upload", res.data.data);
-          const photo = res.data.data.url;
+          const photoURL = res.data.data.url;
+
+          // create user in database
+          const userInfo = {
+            displayName: name,
+            email: email,
+            photoURL: photoURL,
+          };
+
+          axiosSecure.post("/users", userInfo).then((res) => {
+            if (res.data.insertedId) {
+              console.log("user created in database");
+            }
+          });
 
           // update user
-          updateUser(name, photo)
+          updateUser(name, photoURL)
             .then(() => navigate(location?.state || "/"))
             .catch((error) => {
               console.log(error.message);
@@ -66,7 +79,19 @@ const Register = () => {
   const handleSignUpWithGoogle = () => {
     signInWithGoogle()
       .then((result) => {
-        console.log(result.user);
+        // create user in database
+        const userInfo = {
+          displayName: result.user.displayName,
+          email: result.user.email,
+          photoURL: result.user.photoURL,
+        };
+
+        axiosSecure
+          .post("/users", userInfo)
+          .then((res) =>
+            console.log("user data has been stored in db", res.data),
+          );
+
         navigate(location?.state || "/");
       })
       .catch((error) => {

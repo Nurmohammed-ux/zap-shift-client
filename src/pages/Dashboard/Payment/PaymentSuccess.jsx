@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { FaCheckCircle, FaArrowRight, FaCopy } from "react-icons/fa";
+import { FaCheckCircle, FaArrowRight, FaCopy, FaCheck } from "react-icons/fa";
 import { Link, useSearchParams } from "react-router";
 import UseAxiosSecure from "../../../hooks/useAxiosSecure";
 
@@ -8,6 +8,7 @@ const PaymentSuccess = () => {
   const axiosSecure = UseAxiosSecure();
   const sessionId = searchParams.get("session_id");
   const [paymentInfo, setPaymentInfo] = useState(null);
+  const [copiedField, setCopiedField] = useState(null); 
   const hasFetched = useRef(false);
 
   useEffect(() => {
@@ -29,6 +30,16 @@ const PaymentSuccess = () => {
         });
     }
   }, [sessionId, axiosSecure]);
+
+  // Copy handler function
+  const handleCopy = (text, fieldName) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldName);
+    setTimeout(() => {
+      setCopiedField(null);
+    }, 2000); // Reset icon back after 2 seconds
+  };
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center p-6">
@@ -54,26 +65,45 @@ const PaymentSuccess = () => {
               <span className="text-gray-400 block font-medium">
                 Tracking ID:
               </span>
-              <p className="flex gap-2 items-center mt-2">
+              <p className="flex justify-between items-center mt-2">
                 <span className="font-mono font-semibold text-secondary">
                   {paymentInfo.trackingId || "Generating..."}
                 </span>
-                <span className="text-gray-400">
-                  <FaCopy />
-                </span>
+                <button
+                  onClick={() => handleCopy(paymentInfo.trackingId, "tracking")}
+                  className="text-gray-400 hover:text-secondary transition-colors cursor-pointer p-1"
+                  title="Copy Tracking ID"
+                >
+                  {copiedField === "tracking" ? (
+                    <FaCheck className="text-green-500" />
+                  ) : (
+                    <FaCopy />
+                  )}
+                </button>
               </p>
             </div>
-            <div className="text-base truncate mt-4">
+
+            <div className="text-base mt-4">
               <span className="text-gray-400 block font-medium">
                 Transaction ID:
               </span>
-              <p className="flex gap-2 items-center mt-2">
+              <p className="flex justify-between items-center mt-2 gap-2">
                 <span className="font-mono text-secondary font-semibold truncate block">
                   {paymentInfo.transactionId}
                 </span>
-                <span className="text-gray-400">
-                  <FaCopy />
-                </span>
+                <button
+                  onClick={() =>
+                    handleCopy(paymentInfo.transactionId, "transaction")
+                  }
+                  className="text-gray-400 hover:text-secondary transition-colors cursor-pointer p-1 shrink-0"
+                  title="Copy Transaction ID"
+                >
+                  {copiedField === "transaction" ? (
+                    <FaCheck className="text-green-500" />
+                  ) : (
+                    <FaCopy />
+                  )}
+                </button>
               </p>
             </div>
           </div>

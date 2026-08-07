@@ -30,7 +30,7 @@ const MyParcels = () => {
     <div className="p-8">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-secondary">
+          <h2 className="text-3xl font-bold text-secondary">
             Dashboard Overview
           </h2>
           <p className="text-gray-500">

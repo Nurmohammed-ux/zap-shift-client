@@ -33,10 +33,10 @@ const AuthProvider = ({ children }) => {
     return signInWithPopup(auth, provider);
   };
 
-  const updateUser = (name, photo) => {
+  const updateUser = (name, photoURL) => {
     const info = {
       displayName: name,
-      photoURL: photo,
+      photoURL: photoURL,
     };
     return updateProfile(auth.currentUser, info);
   };
@@ -54,6 +54,7 @@ const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      // console.log(currentUser);
     });
     return () => unsubscribe();
   }, []);
