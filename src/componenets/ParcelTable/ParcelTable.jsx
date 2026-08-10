@@ -197,6 +197,7 @@ const ParcelTable = ({ parcels = [], refetch }) => {
                       </button>
                       <button
                         onClick={() => handleParcelDelete(parcel._id)}
+                        title="Parcel Delete"
                         className="text-red-300 hover:text-red-600"
                       >
                         <RiDeleteBin5Line size={18} />

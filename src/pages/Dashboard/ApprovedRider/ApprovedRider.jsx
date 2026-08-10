@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import UseAxiosSecure from "../../../hooks/useAxiosSecure";
 import {
@@ -8,15 +9,18 @@ import {
   FaEnvelope,
   FaPhone,
   FaRegTrashAlt,
+  FaTimes,
 } from "react-icons/fa";
 import { FaUserCheck } from "react-icons/fa6";
-import { MdPersonRemove } from "react-icons/md";
+import { MdGridView, MdPersonRemove } from "react-icons/md";
 import Swal from "sweetalert2";
 import UseAuth from "../../../hooks/useAuth";
 
 const ApprovedRider = () => {
   const axiosSecure = UseAxiosSecure();
   const { user } = UseAuth();
+  const [selectedRider, setSelectedRider] = useState(null);
+
   const { data: riders = [], refetch } = useQuery({
     queryKey: ["riders", "pending"],
     queryFn: async () => {
@@ -77,7 +81,6 @@ const ApprovedRider = () => {
         axiosSecure
           .delete(`/riders/${rider._id}?email=${user.email}`)
           .then((result) => {
-            console.log(result.data);
             if (result.data.deletedCount) {
               refetch();
 
@@ -105,9 +108,6 @@ const ApprovedRider = () => {
             details.
           </p>
         </div>
-        <div className="bg-primary/10 text-secondary px-4 py-2 rounded-xl text-base font-bold border border-primary/20 w-fit">
-          Total Requests: {riders.length}
-        </div>
       </div>
 
       {/* Table Container */}
@@ -115,7 +115,7 @@ const ApprovedRider = () => {
         <table className="table w-full text-left border-collapse">
           {/* table Head */}
           <thead>
-            <tr className="bg-gray-50 text-gray-700 uppercase text-xs tracking-wider font-semibold border-b border-gray-200">
+            <tr className="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider font-semibold border-b border-gray-200">
               <th className="py-4 px-6">Rider Info</th>
               <th className="py-4 px-6">Contact & Location</th>
               <th className="py-4 px-6">Bike & License</th>
@@ -139,7 +139,7 @@ const ApprovedRider = () => {
               riders.map((rider) => (
                 <tr
                   key={rider._id}
-                  className="hover:bg-gray-50/80 transition-colors duration-150 even:bg-gray-50/50"
+                  className="hover:bg-gray-50/80 transition-colors duration-150 even:bg-gray-100"
                 >
                   {/* Rider Info (Name & NID) */}
                   <td className="py-4 px-6 font-semibold text-secondary">
@@ -193,12 +193,12 @@ const ApprovedRider = () => {
                   {/* Status Info */}
                   <td className="py-4 px-6">
                     <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${
+                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
                         rider.status === "approved"
-                          ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+                          ? "bg-emerald-100 text-emerald-800"
                           : rider.status === "rejected"
-                            ? "bg-rose-100 text-rose-800 border-rose-200"
-                            : "bg-orange-100 text-orange-600 border-orange-200"
+                            ? "bg-rose-100 text-rose-800"
+                            : "bg-orange-100 text-orange-600"
                       }`}
                     >
                       {rider.status}
@@ -209,22 +209,29 @@ const ApprovedRider = () => {
                   <td className="py-3 px-4 text-center">
                     <div className="flex items-center justify-center gap-2">
                       <button
+                        onClick={() => setSelectedRider(rider)}
+                        className="btn btn-sm hover:bg-primary/50 text-secondary hover:text-black border-none transition-all duration-200 font-semibold"
+                        title="View Rider Details"
+                      >
+                        <MdGridView />
+                      </button>
+                      <button
                         onClick={() => handleApproval(rider)}
-                        className="btn btn-sm bg-primary/20 hover:bg-primary/50 text-secondary hover:text-black border-none transition-all duration-200 font-semibold"
+                        className="btn btn-sm hover:bg-primary/50 text-secondary hover:text-black border-none transition-all duration-200 font-semibold"
                         title="Approve Rider"
                       >
                         <FaUserCheck />
                       </button>
                       <button
                         onClick={() => handleRejection(rider)}
-                        className="btn btn-sm bg-primary/20 hover:bg-primary/50 text-secondary hover:text-black border-none transition-all duration-200 font-semibold"
+                        className="btn btn-sm hover:bg-primary/50 text-secondary hover:text-black border-none transition-all duration-200 font-semibold"
                         title="Reject Rider"
                       >
                         <MdPersonRemove size={14} />
                       </button>
                       <button
                         onClick={() => handleDeleteRider(rider)}
-                        className="btn btn-sm bg-primary/20 hover:bg-primary/50 text-secondary hover:text-red-500 border-none transition-all duration-200 font-semibold"
+                        className="btn btn-sm hover:bg-primary/50 text-secondary hover:text-red-500 border-none transition-all duration-200 font-semibold"
                         title="Delete Rider"
                       >
                         <FaRegTrashAlt />
@@ -237,6 +244,111 @@ const ApprovedRider = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Rider Details Modal */}
+      {selectedRider && (
+        <dialog className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-2xl rounded-2xl p-6 bg-white shadow-2xl">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+              <h3 className="font-extrabold text-xl text-secondary flex items-center gap-4">
+                <FaUser className="text-gray-400" /> Rider Details Profile
+              </h3>
+              <button
+                onClick={() => setSelectedRider(null)}
+                className="btn btn-sm btn-circle btn-ghost text-gray-500 hover:bg-gray-100"
+              >
+                <FaTimes size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body / Information Grid */}
+            <div className="py-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Full Name
+                </span>
+                <span className="font-bold text-gray-800">
+                  {selectedRider.name || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Email Address
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedRider.email || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Phone Number
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedRider.phone || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  National ID (NID)
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedRider.nid || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Region & District
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedRider.region || "N/A"},{" "}
+                  {selectedRider.district || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Full Address
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedRider.yourAddress || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Bike Model
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedRider.bikeModel || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Bike Registration
+                </span>
+                <span className="font-medium text-gray-800 font-mono">
+                  {selectedRider.bikeRegistration || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1 md:col-span-2">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  License Number
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedRider.license || "N/A"}
+                </span>
+              </div>
+            </div>    
+          </div>
+        </dialog>
+      )}
     </div>
   );
 };

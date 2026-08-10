@@ -1,11 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import UseAuth from "../../../hooks/useAuth";
 import UseAxiosSecure from "../../../hooks/useAxiosSecure";
-import { FaReceipt, FaMapMarkerAlt, FaUser } from "react-icons/fa";
+import {
+  FaReceipt,
+  FaMapMarkerAlt,
+  FaUser,
+  FaTimes,
+  FaBox,
+  FaPhone,
+} from "react-icons/fa";
+import { MdGridView } from "react-icons/md";
+import { useState } from "react";
 
 const PaymentHistory = () => {
   const { user } = UseAuth();
   const axiosSecure = UseAxiosSecure();
+  const [selectedPayment, setSelectedPayment] = useState(null);
 
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ["myPayments", user?.email],
@@ -35,9 +45,6 @@ const PaymentHistory = () => {
             Track and review all your completed shipping transactions and parcel
             details.
           </p>
-        </div>
-        <div className="bg-primary/10 text-secondary px-4 py-2 rounded-xl text-base font-bold border border-primary/20 w-fit">
-          Total Transactions: {payments.length}
         </div>
       </div>
 
@@ -93,7 +100,7 @@ const PaymentHistory = () => {
                   </td>
 
                   {/* Tracking / Transaction Number */}
-                  <td className="py-4 px-6 text-sm text-gray-600">
+                  <td className="py-4 px-6 text-sm text-gray-600 font-mono">
                     {payment.transactionId || "N/A"}
                   </td>
 
@@ -117,8 +124,12 @@ const PaymentHistory = () => {
 
                   {/* Action */}
                   <td className="py-4 px-6 text-center">
-                    <button className="btn btn-sm bg-primary/20 hover:bg-primary/50 text-secondary hover:text-black border-none transition-all duration-200 gap-1.5 font-semibold">
-                      View
+                    <button
+                      onClick={() => setSelectedPayment(payment)}
+                      className="btn btn-sm hover:bg-primary/50 text-secondary hover:text-black border-none transition-all duration-200 gap-1.5 font-semibold"
+                      title="View Payment Details"
+                    >
+                      <MdGridView />
                     </button>
                   </td>
                 </tr>
@@ -127,6 +138,128 @@ const PaymentHistory = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Payment Details Modal */}
+      {selectedPayment && (
+        <dialog className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-2xl rounded-2xl p-6 bg-white shadow-2xl">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+              <h3 className="font-extrabold text-xl text-secondary flex items-center gap-2">
+                <FaReceipt className="text-primary" /> Transaction & Parcel
+                Details
+              </h3>
+              <button
+                onClick={() => setSelectedPayment(null)}
+                className="btn btn-sm btn-circle btn-ghost text-gray-500 hover:bg-gray-100"
+              >
+                <FaTimes size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body / Information Grid */}
+            <div className="py-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1 md:col-span-2">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Transaction ID
+                </span>
+                <span className="font-mono font-bold text-secondary">
+                  {selectedPayment.transactionId || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Paid Amount
+                </span>
+                <span className="font-bold text-emerald-600">
+                  ${selectedPayment.amount}{" "}
+                  {selectedPayment.currency?.toUpperCase()}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Payment Status
+                </span>
+                <span className="font-medium text-gray-800 uppercase">
+                  {selectedPayment.paymentStatus || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Payment Date
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedPayment.paidAt
+                    ? new Date(selectedPayment.paidAt).toLocaleString()
+                    : "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Sender Email
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedPayment.customerEmail || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Parcel Name
+                </span>
+                <span className="font-bold text-secondary flex items-center gap-1.5">
+                  <FaBox className="text-gray-400 text-xs shrink-0" />
+                  {selectedPayment.parcel?.parcelName || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Parcel Type / Weight
+                </span>
+                <span className="font-medium text-gray-800">
+                  {selectedPayment.parcel?.parcelType || "N/A"} (
+                  {selectedPayment.parcel?.parcelWeight || "0"} kg)
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Recipient Name
+                </span>
+                <span className="font-medium text-gray-800 flex items-center gap-1.5">
+                  <FaUser className="text-gray-400 text-xs shrink-0" />
+                  {selectedPayment.parcel?.receiverName || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Recipient Phone
+                </span>
+                <span className="font-medium text-gray-800 flex items-center gap-1.5">
+                  <FaPhone className="text-gray-400 text-xs shrink-0" />
+                  {selectedPayment.parcel?.receiverPhone || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1 md:col-span-2">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Recipient Address
+                </span>
+                <span className="font-medium text-gray-800 flex items-center gap-1.5">
+                  <FaMapMarkerAlt className="text-gray-400 text-xs shrink-0" />
+                  {selectedPayment.parcel?.receiverAddress || "N/A"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </dialog>
+      )}
     </div>
   );
 };

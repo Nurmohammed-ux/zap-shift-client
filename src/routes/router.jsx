@@ -19,6 +19,8 @@ import PaymentCancelled from "../pages/Dashboard/Payment/PaymentCancelled";
 import Services from "../pages/Services/Services";
 import PaymentHistory from "../pages/Dashboard/PaymentHistory/PaymentHistory";
 import ApprovedRider from "../pages/Dashboard/ApprovedRider/ApprovedRider";
+import UsersManagement from "../pages/Dashboard/UsersManagement/UsersManagement";
+import AdminRoute from "./AdminRoute";
 
 const router = createBrowserRouter([
   {
@@ -71,7 +73,7 @@ const router = createBrowserRouter([
       },
       {
         path: "services",
-        element: <Services />
+        element: <Services />,
       },
       {
         path: "*",
@@ -119,12 +121,24 @@ const router = createBrowserRouter([
       },
       {
         path: "payment-history",
-        element: <PaymentHistory />
+        element: <PaymentHistory />,
       },
       {
         path: "approve-riders",
-        element: <ApprovedRider />
-      }
+        element: (
+          <AdminRoute>
+            <ApprovedRider />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "users-management",
+        element: (
+          <AdminRoute>
+            <UsersManagement />
+          </AdminRoute>
+        ),
+      },
     ],
   },
 ]);

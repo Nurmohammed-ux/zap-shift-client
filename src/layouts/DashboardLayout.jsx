@@ -10,6 +10,8 @@ import { IoMdHelpCircleOutline, IoIosLogOut } from "react-icons/io";
 import DashboardNavbar from "../pages/Shared/DashboardNavbar/DashboardNavbar";
 import UseAuth from "../hooks/useAuth";
 import { FaMotorcycle } from "react-icons/fa6";
+import { FaUsers } from "react-icons/fa";
+import UseRole from "../hooks/useRole";
 
 const linkBaseStyle =
   "is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-3 w-full text-base px-3 py-2";
@@ -23,6 +25,7 @@ const getLinkClass = ({ isActive }) =>
 
 const DashboardLayout = () => {
   const { logOut } = UseAuth();
+  const { role } = UseRole();
 
   const handleLogout = () => {
     logOut()
@@ -128,19 +131,37 @@ const DashboardLayout = () => {
                 </NavLink>
               </li>
 
-              {/* Riders NavLink */}
-              <li>
-                <NavLink
-                  to={"/dashboard/approve-riders"}
-                  className={getLinkClass}
-                  data-tip="Approve Riders"
-                >
-                  <FaMotorcycle className="my-1.5 size-5 -ml-px shrink-0" />
-                  <span className="is-drawer-close:hidden truncate">
-                   Approve Riders
-                  </span>
-                </NavLink>
-              </li>
+              {role === "admin" && (
+                <>
+                  {/* Users Management NavLink */}
+                  <li>
+                    <NavLink
+                      to={"/dashboard/users-management"}
+                      className={getLinkClass}
+                      data-tip="Users Management"
+                    >
+                      <FaUsers className="my-1.5 size-5 -ml-px shrink-0" />
+                      <span className="is-drawer-close:hidden truncate">
+                        Users Management
+                      </span>
+                    </NavLink>
+                  </li>
+
+                  {/* Riders NavLink */}
+                  <li>
+                    <NavLink
+                      to={"/dashboard/approve-riders"}
+                      className={getLinkClass}
+                      data-tip="Approve Riders"
+                    >
+                      <FaMotorcycle className="my-1.5 size-5 -ml-px shrink-0" />
+                      <span className="is-drawer-close:hidden truncate">
+                        Approve Riders
+                      </span>
+                    </NavLink>
+                  </li>
+                </>
+              )}
 
               {/* Payment History NavLink */}
               <li>
