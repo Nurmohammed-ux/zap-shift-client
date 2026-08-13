@@ -21,8 +21,7 @@ const getStatusBadge = (status) => {
     case "ready pick up":
     case "ready-for-pickup":
       return "bg-amber-100 text-amber-600";
-    case "in transit":
-    case "intransit":
+    case "driver_assigned":
       return "bg-blue-100 text-blue-600";
     case "delivered":
       return "bg-green-100 text-green-600";
@@ -183,7 +182,7 @@ const ParcelTable = ({ parcels = [], refetch }) => {
                   </td>
                   <td className="text-gray-700">
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusBadge(
+                      className={`px-3 py-1 rounded-full text-sm font-semibold uppercase ${getStatusBadge(
                         parcel.deliveryStatus || "pending",
                       )}`}
                     >
@@ -215,7 +214,7 @@ const ParcelTable = ({ parcels = [], refetch }) => {
       </div>
 
       {parcels.length > PAGE_SIZE && (
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex justify-between items-center mt-8">
           <button
             className="btn btn-sm bg-white border border-gray-200 rounded-full"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -224,7 +223,7 @@ const ParcelTable = ({ parcels = [], refetch }) => {
             ← Previous
           </button>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
               <button
                 key={n}
@@ -232,7 +231,7 @@ const ParcelTable = ({ parcels = [], refetch }) => {
                 className={`size-7 rounded-full text-sm ${
                   currentPage === n
                     ? "bg-primary font-semibold"
-                    : "text-gray-500"
+                    : "text-gray-500 bg-gray-100"
                 }`}
               >
                 {n}

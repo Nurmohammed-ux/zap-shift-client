@@ -17,13 +17,24 @@ const PaymentHistory = () => {
   const axiosSecure = UseAxiosSecure();
   const [selectedPayment, setSelectedPayment] = useState(null);
 
+  const PAGE_SIZE = 8;
+  const [page, setPage] = useState(1);
+
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ["myPayments", user?.email],
     queryFn: async () => {
-      const res = await axiosSecure.get(`/payments?email=${user.email}`);
+      // const res = await axiosSecure.get(`/payments?email=${user.email}`);
+      const res = await axiosSecure.get(`/payments`);
       return res.data;
     },
   });
+
+  const totalPages = Math.max(1, Math.ceil(payments.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageRows = payments.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   if (isLoading) {
     return (
@@ -64,7 +75,7 @@ const PaymentHistory = () => {
 
           {/* table Body */}
           <tbody className="divide-y divide-gray-100 text-sm">
-            {payments.length === 0 ? (
+            {pageRows.length === 0 ? (
               <tr>
                 <td
                   colSpan="5"
@@ -74,7 +85,7 @@ const PaymentHistory = () => {
                 </td>
               </tr>
             ) : (
-              payments.map((payment) => (
+              pageRows.map((payment) => (
                 <tr
                   key={payment._id}
                   className="hover:bg-gray-50/80 transition-colors duration-150 even:bg-gray-100"
@@ -139,6 +150,43 @@ const PaymentHistory = () => {
         </table>
       </div>
 
+      {/* Pagination Controls */}
+      {payments.length > PAGE_SIZE && (
+        <div className="flex justify-between items-center mt-8 px-2">
+          <button
+            className="btn btn-sm bg-white border border-gray-200 rounded-full"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            ← Previous
+          </button>
+
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                onClick={() => setPage(n)}
+                className={`size-7 rounded-full text-sm ${
+                  currentPage === n
+                    ? "bg-primary font-semibold"
+                    : "text-gray-500 bg-gray-100"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+
+          <button
+            className="btn btn-sm bg-white border border-gray-200 rounded-full"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next →
+          </button>
+        </div>
+      )}
+
       {/* Payment Details Modal */}
       {selectedPayment && (
         <dialog className="modal modal-open">
@@ -184,6 +232,18 @@ const PaymentHistory = () => {
                 </span>
                 <span className="font-medium text-gray-800 uppercase">
                   {selectedPayment.paymentStatus || "N/A"}
+                </span>
+              </div>
+
+              {/* Added Delivery Status Block */}
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Delivery Status
+                </span>
+                <span className="font-medium text-secondary">
+                  {selectedPayment.parcel?.deliveryStatus ||
+                    selectedPayment.deliveryStatus ||
+                    "N/A"}
                 </span>
               </div>
 

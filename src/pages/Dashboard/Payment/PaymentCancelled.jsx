@@ -29,7 +29,7 @@ const PaymentCancelled = () => {
           </Link>
           <Link
             to="/dashboard/my-parcels"
-            className="btn btn-ghost text-gray-500 hover:text-secondary w-full flex items-center justify-center gap-2"
+            className="btn btn-ghost border border-gray-200 text-gray-800 hover:text-secondary w-full flex items-center justify-center gap-2"
           >
             <FaArrowLeft size={12} /> Back to My Parcels
           </Link>

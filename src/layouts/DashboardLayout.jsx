@@ -10,8 +10,9 @@ import { IoMdHelpCircleOutline, IoIosLogOut } from "react-icons/io";
 import DashboardNavbar from "../pages/Shared/DashboardNavbar/DashboardNavbar";
 import UseAuth from "../hooks/useAuth";
 import { FaMotorcycle } from "react-icons/fa6";
-import { FaUsers } from "react-icons/fa";
+import { FaTasks, FaUsers } from "react-icons/fa";
 import UseRole from "../hooks/useRole";
+import { MdAssignmentAdd } from "react-icons/md";
 
 const linkBaseStyle =
   "is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-3 w-full text-base px-3 py-2";
@@ -131,6 +132,25 @@ const DashboardLayout = () => {
                 </NavLink>
               </li>
 
+              {/* Rider only Links */}
+              {role === "rider" && (
+                <>
+                  <li>
+                    <NavLink
+                      to={"/dashboard/assigned-deliveries"}
+                      className={getLinkClass}
+                      data-tip="Assigned Deliveries"
+                    >
+                      <FaTasks className="my-1.5 size-4 shrink-0 text-gray-600" />
+                      <span className="is-drawer-close:hidden truncate">
+                        Assigned Deliveries
+                      </span>
+                    </NavLink>
+                  </li>
+                </>
+              )}
+
+              {/* Admin only links */}
               {role === "admin" && (
                 <>
                   {/* Users Management NavLink */}
@@ -140,7 +160,7 @@ const DashboardLayout = () => {
                       className={getLinkClass}
                       data-tip="Users Management"
                     >
-                      <FaUsers className="my-1.5 size-5 -ml-px shrink-0" />
+                      <FaUsers className="my-1.5 size-5 -ml-px shrink-0 text-gray-600" />
                       <span className="is-drawer-close:hidden truncate">
                         Users Management
                       </span>
@@ -154,9 +174,23 @@ const DashboardLayout = () => {
                       className={getLinkClass}
                       data-tip="Approve Riders"
                     >
-                      <FaMotorcycle className="my-1.5 size-5 -ml-px shrink-0" />
+                      <FaMotorcycle className="my-1.5 size-5 -ml-px shrink-0 text-gray-600" />
                       <span className="is-drawer-close:hidden truncate">
                         Approve Riders
+                      </span>
+                    </NavLink>
+                  </li>
+
+                  {/* Assign Riders NavLink */}
+                  <li>
+                    <NavLink
+                      to={"/dashboard/assign-riders"}
+                      className={getLinkClass}
+                      data-tip="Assign Riders"
+                    >
+                      <MdAssignmentAdd className="my-1.5 size-5 -ml-px shrink-0 text-gray-600" />
+                      <span className="is-drawer-close:hidden truncate">
+                        Assign Riders
                       </span>
                     </NavLink>
                   </li>
@@ -170,7 +204,7 @@ const DashboardLayout = () => {
                   className={getLinkClass}
                   data-tip="Payment History"
                 >
-                  <TbFileInvoice className="my-1.5 size-5 -ml-0.5 shrink-0" />
+                  <TbFileInvoice className="my-1.5 size-5 -ml-0.5 shrink-0 text-gray-600" />
                   <span className="is-drawer-close:hidden truncate">
                     Payment History
                   </span>
@@ -220,7 +254,7 @@ const DashboardLayout = () => {
               </li>
             </ul>
 
-            <div className="px-4 pt-40 pb-2 w-full">
+            <div className="px-4 pt-auto pb-2 w-full">
               {/* Shown fully when the sidebar is open */}
               <h4 className="is-drawer-close:hidden px-2 text-base font-medium text-gray-900">
                 GENERAL

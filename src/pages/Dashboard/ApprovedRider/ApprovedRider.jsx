@@ -21,6 +21,9 @@ const ApprovedRider = () => {
   const { user } = UseAuth();
   const [selectedRider, setSelectedRider] = useState(null);
 
+  const PAGE_SIZE = 6;
+  const [page, setPage] = useState(1);
+
   const { data: riders = [], refetch } = useQuery({
     queryKey: ["riders", "pending"],
     queryFn: async () => {
@@ -28,6 +31,13 @@ const ApprovedRider = () => {
       return res.data;
     },
   });
+
+  const totalPages = Math.max(1, Math.ceil(riders.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageRows = riders.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   const updateRiderStatus = (rider, status) => {
     const updateInfo = {
@@ -101,7 +111,7 @@ const ApprovedRider = () => {
         <div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-secondary flex items-center gap-3">
             <FaMotorcycle size={30} className="text-gray-500 text-2xl" />{" "}
-            Pending Riders
+            Approved Riders ({riders.length})
           </h2>
           <p className="text-gray-500 text-base mt-2">
             Review and manage incoming rider applications and verification
@@ -119,24 +129,25 @@ const ApprovedRider = () => {
               <th className="py-4 px-6">Rider Info</th>
               <th className="py-4 px-6">Contact & Location</th>
               <th className="py-4 px-6">Bike & License</th>
-              <th className="py-4 px-6">Status</th>
+              <th className="py-4 px-6">Application Status</th>
+              <th className="py-4 px-6">Work Status</th>
               <th className="py-4 px-6 text-center">Action</th>
             </tr>
           </thead>
 
           {/* table Body */}
           <tbody className="divide-y divide-gray-100 text-sm">
-            {riders.length === 0 ? (
+            {pageRows.length === 0 ? (
               <tr>
                 <td
-                  colSpan="5"
+                  colSpan="6"
                   className="text-center py-12 text-gray-400 font-medium"
                 >
                   No pending rider applications found.
                 </td>
               </tr>
             ) : (
-              riders.map((rider) => (
+              pageRows.map((rider) => (
                 <tr
                   key={rider._id}
                   className="hover:bg-gray-50/80 transition-colors duration-150 even:bg-gray-100"
@@ -190,10 +201,10 @@ const ApprovedRider = () => {
                     </div>
                   </td>
 
-                  {/* Status Info */}
+                  {/* Application Status Info */}
                   <td className="py-4 px-6">
                     <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                      className={`inline-flex items-start px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
                         rider.status === "approved"
                           ? "bg-emerald-100 text-emerald-800"
                           : rider.status === "rejected"
@@ -202,6 +213,24 @@ const ApprovedRider = () => {
                       }`}
                     >
                       {rider.status}
+                    </span>
+                  </td>
+
+                  {/* Work Status Info */}
+                  <td className="py-4 px-6">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                        rider.workStatus === "available"
+                          ? "bg-emerald-100 text-emerald-800"
+                          : rider.workStatus === "unavailable"
+                            ? "bg-rose-100 text-rose-800"
+                            : rider.workStatus === "in-transit" ||
+                                rider.workStatus === "intransit"
+                              ? "bg-blue-100 text-blue-600"
+                              : "bg-orange-100 text-orange-600"
+                      }`}
+                    >
+                      {rider.workStatus || "unavailable"}
                     </span>
                   </td>
 
@@ -244,6 +273,43 @@ const ApprovedRider = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {riders.length > PAGE_SIZE && (
+        <div className="flex justify-between items-center mt-8 px-2">
+          <button
+            className="btn btn-sm bg-white border border-gray-200 rounded-full"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            ← Previous
+          </button>
+
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                onClick={() => setPage(n)}
+                className={`size-7 rounded-full text-sm ${
+                  currentPage === n
+                    ? "bg-primary font-semibold"
+                    : "text-gray-500 bg-gray-100"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+
+          <button
+            className="btn btn-sm bg-white border border-gray-200 rounded-full"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next →
+          </button>
+        </div>
+      )}
 
       {/* Rider Details Modal */}
       {selectedRider && (
@@ -288,6 +354,24 @@ const ApprovedRider = () => {
                 </span>
                 <span className="font-medium text-gray-800">
                   {selectedRider.phone || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Application Status
+                </span>
+                <span className="font-medium text-secondary uppercase">
+                  {selectedRider.status || "N/A"}
+                </span>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col gap-1">
+                <span className="text-xs text-gray-400 uppercase font-bold">
+                  Work Status
+                </span>
+                <span className="font-medium text-secondary uppercase">
+                  {selectedRider.workStatus || "unavailable"}
                 </span>
               </div>
 
@@ -345,7 +429,7 @@ const ApprovedRider = () => {
                   {selectedRider.license || "N/A"}
                 </span>
               </div>
-            </div>    
+            </div>
           </div>
         </dialog>
       )}

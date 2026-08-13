@@ -118,10 +118,10 @@ const PaymentSuccess = () => {
             Go to My Parcels <FaArrowRight size={12} />
           </Link>
           <Link
-            to="/"
-            className="btn btn-ghost text-gray-500 hover:text-secondary w-full"
+            to="/dashboard/payment-history"
+            className="btn btn-ghost border border-gray-200 text-gray-800 hover:text-secondary w-full"
           >
-            Back to Home
+            Go to Payment History <FaArrowRight size={12} />
           </Link>
         </div>
       </div>

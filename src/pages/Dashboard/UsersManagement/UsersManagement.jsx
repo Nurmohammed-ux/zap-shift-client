@@ -11,21 +11,33 @@ import {
 } from "react-icons/fa";
 import { FiShieldOff } from "react-icons/fi";
 import { MdGridView } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 const UsersManagement = () => {
   const axiosSecure = UseAxiosSecure();
   const [selectedUser, setSelectedUser] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [inputValue, setInputValue] = useState("");
+
+  // for searching issue
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchText(inputValue);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [inputValue]);
 
   const {
     data: users = [],
-    isLoading,
+    // isPending,
+    isFetching,
     refetch,
   } = useQuery({
-    queryKey: ["users"],
+    queryKey: ["users", searchText],
     queryFn: async () => {
-      const res = await axiosSecure.get(`/users`);
+      const res = await axiosSecure.get(`/users?searchText=${searchText}`);
       return res.data;
     },
   });
@@ -123,13 +135,13 @@ const UsersManagement = () => {
       }
     });
   };
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64 bg-white rounded-2xl shadow-sm border border-gray-100">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
-  }
+  // if (isPending) {
+  //   return (
+  //     <div className="flex justify-center items-center h-64 bg-white rounded-2xl shadow-sm border border-gray-100">
+  //       <span className="loading loading-spinner loading-lg text-primary"></span>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
@@ -144,6 +156,41 @@ const UsersManagement = () => {
             View and manage all registered system users, roles, and profiles.
           </p>
         </div>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <label className="input">
+            <svg
+              className="h-[1em] opacity-50"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <g
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeWidth="2.5"
+                fill="none"
+                stroke="currentColor"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </g>
+            </svg>
+            <input
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              type="text"
+              className="grow rounded-2xl"
+              placeholder="Search Users"
+            />
+
+            <span className="w-5 h-5 flex items-center justify-center">
+              <span
+                className={`loading loading-spinner loading-sm transition-opacity ${
+                  isFetching ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            </span>
+          </label>
+        </form>
       </div>
 
       {/* Table Container */}

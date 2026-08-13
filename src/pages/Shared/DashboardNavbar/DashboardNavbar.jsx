@@ -3,11 +3,13 @@ import { Link } from "react-router";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { LuChevronDown } from "react-icons/lu";
 import UseAuth from "../../../hooks/useAuth";
+import UseRole from "../../../hooks/useRole";
 
 const DashboardNavbar = () => {
   const { user } = UseAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const { role } = UseRole();
 
   // Close the dropdown on outside click.
   useEffect(() => {
@@ -76,7 +78,9 @@ const DashboardNavbar = () => {
               <span className="text-sm font-semibold text-secondary">
                 {user?.displayName || "User"}
               </span>
-              <span className="text-sm text-gray-500">Admin</span>
+              <span className="text-sm text-gray-500 uppercase font-medium">
+                {role || "user"}
+              </span>
             </div>
             <LuChevronDown
               size={20}
@@ -103,17 +107,6 @@ const DashboardNavbar = () => {
                 >
                   Change Password
                 </Link>
-              </li>
-              <li>
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    // logOut?.();
-                  }}
-                  className="text-red-500"
-                >
-                  Logout
-                </button>
               </li>
             </ul>
           )}
