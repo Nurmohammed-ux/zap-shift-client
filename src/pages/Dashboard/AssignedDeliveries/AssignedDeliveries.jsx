@@ -19,8 +19,10 @@ const getStatusBadge = (status) => {
     case "ready pick up":
     case "ready-for-pickup":
       return "bg-amber-100 text-amber-600";
+    case "driver-assigned":
     case "driver_assigned":
       return "bg-blue-100 text-blue-600";
+    case "rider-arriving":
     case "rider_arriving":
       return "bg-indigo-100 text-indigo-600";
     case "parcel-picked-up":
@@ -49,7 +51,7 @@ const AssignedDeliveries = () => {
     queryKey: ["parcels", user?.email, "active-deliveries"],
     queryFn: async () => {
       const res = await axiosSecure.get(
-        `/parcels/rider?riderEmail=${user.email}&deliveryStatus=driver_assigned,rider_arriving,parcel-picked-up`
+        `/parcels/rider?riderEmail=${user.email}&deliveryStatus=driver-assigned,rider-arriving,parcel-picked-up`,
       );
       return res.data;
     },
@@ -69,6 +71,7 @@ const AssignedDeliveries = () => {
     const statusInfo = {
       deliveryStatus: status,
       riderEmail: user?.email,
+      trackingId: parcel.trackingId,
     };
 
     const message = status
@@ -104,7 +107,7 @@ const AssignedDeliveries = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         const statusInfo = {
-          deliveryStatus: "driver_rejected",
+          deliveryStatus: "driver-rejected",
           riderEmail: user.email,
         };
 
@@ -202,13 +205,14 @@ const AssignedDeliveries = () => {
                   </td>
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-3 text-gray-500">
-                      {parcel.deliveryStatus === "driver_assigned" ? (
+                      {parcel.deliveryStatus === "driver-assigned" ||
+                      parcel.deliveryStatus === "driver_assigned" ? (
                         <>
                           <button
                             onClick={() =>
                               handleDeliveryStatusUpdate(
                                 parcel,
-                                "rider_arriving",
+                                "rider-arriving",
                               )
                             }
                             title="Parcel Accept"
@@ -224,7 +228,8 @@ const AssignedDeliveries = () => {
                             <FaTimes size={16} />
                           </button>
                         </>
-                      ) : parcel.deliveryStatus === "driver_rejected" ? (
+                      ) : parcel.deliveryStatus === "driver-rejected" ||
+                        parcel.deliveryStatus === "driver_rejected" ? (
                         <p className="px-2 py-1 rounded-full text-red-700 bg-red-50 text-xs font-semibold">
                           Rejected
                         </p>
@@ -241,8 +246,13 @@ const AssignedDeliveries = () => {
                         onClick={() =>
                           handleDeliveryStatusUpdate(parcel, "parcel-picked-up")
                         }
+                        disabled={
+                          parcel.deliveryStatus === "driver-assigned" ||
+                          parcel.deliveryStatus === "driver-rejected" ||
+                          parcel.deliveryStatus === "parcel-picked-up"
+                        }
                         title="Parcel Picked Up"
-                        className="text-secondary bg-green-50 hover:bg-green-100 btn btn-xs pt-0.5"
+                        className="text-secondary bg-green-50 hover:bg-green-100 btn btn-xs pt-0.5 disabled:opacity-45 disabled:cursor-not-allowed"
                       >
                         Picked Up
                       </button>
@@ -250,8 +260,14 @@ const AssignedDeliveries = () => {
                         onClick={() =>
                           handleDeliveryStatusUpdate(parcel, "parcel-delivered")
                         }
+                        disabled={
+                          parcel.deliveryStatus === "driver-assigned" ||
+                          parcel.deliveryStatus === "driver-rejected" ||
+                          parcel.deliveryStatus === "rider-arriving" ||
+                          parcel.deliveryStatus !== "parcel-picked-up"
+                        }
                         title="Parcel Delivered"
-                        className="text-secondary bg-green-50 hover:bg-green-100 btn btn-xs pt-0.5"
+                        className="text-secondary bg-green-50 hover:bg-green-100 btn btn-xs pt-0.5 disabled:opacity-45 disabled:cursor-not-allowed"
                       >
                         Delivered
                       </button>

@@ -9,7 +9,7 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { IoMdHelpCircleOutline, IoIosLogOut } from "react-icons/io";
 import DashboardNavbar from "../pages/Shared/DashboardNavbar/DashboardNavbar";
 import UseAuth from "../hooks/useAuth";
-import { FaMotorcycle } from "react-icons/fa6";
+import { FaClipboardCheck, FaMotorcycle } from "react-icons/fa6";
 import { FaTasks, FaUsers } from "react-icons/fa";
 import UseRole from "../hooks/useRole";
 import { MdAssignmentAdd } from "react-icons/md";
@@ -135,6 +135,7 @@ const DashboardLayout = () => {
               {/* Rider only Links */}
               {role === "rider" && (
                 <>
+                {/* Assigned Deliveries */}
                   <li>
                     <NavLink
                       to={"/dashboard/assigned-deliveries"}
@@ -144,6 +145,20 @@ const DashboardLayout = () => {
                       <FaTasks className="my-1.5 size-4 shrink-0 text-gray-600" />
                       <span className="is-drawer-close:hidden truncate">
                         Assigned Deliveries
+                      </span>
+                    </NavLink>
+                  </li>
+
+                {/* Completed Deliveries */}
+                  <li>
+                    <NavLink
+                      to={"/dashboard/completed-deliveries"}
+                      className={getLinkClass}
+                      data-tip="Completed Deliveries"
+                    >
+                      <FaClipboardCheck className="my-1.5 size-5 -ml-0.5 shrink-0 text-gray-600" />
+                      <span className="is-drawer-close:hidden truncate">
+                        Completed Deliveries
                       </span>
                     </NavLink>
                   </li>

@@ -38,7 +38,7 @@ const AssignRiders = () => {
     queryKey: ["parcels", "admin-dispatch-pool"],
     queryFn: async () => {
       const res = await axiosSecure.get(
-        "/parcels?deliveryStatus=ready-for-pickup,driver_rejected",
+        "/parcels?deliveryStatus=ready-for-pickup,driver-rejected",
       );
       return res.data;
     },
@@ -66,6 +66,7 @@ const AssignRiders = () => {
       riderName: rider.name,
       riderEmail: rider.email,
       riderContact: rider.phone,
+      trackingId: selectedParcel.trackingId,
     };
 
     try {

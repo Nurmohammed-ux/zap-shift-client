@@ -34,7 +34,7 @@ const Pricing = () => {
   const handleConfirm = async () => {
     const result = await Swal.fire({
       title: "Confirm this booking?",
-      html: `You're about to book a <b>${parcelInfo.parcelType}</b> parcel for <b>${cost} Tk</b>.`,
+      html: `You're about to book a <b>${parcelInfo.parcelType}</b> parcel for <b>$ ${cost}</b>.`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Yes, confirm",

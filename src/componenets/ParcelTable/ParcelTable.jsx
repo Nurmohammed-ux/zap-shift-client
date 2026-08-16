@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
-import { LuCalendar, LuChevronDown, LuFilter, LuPencil } from "react-icons/lu";
+import { LuCalendar, LuChevronDown, LuFilter } from "react-icons/lu";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import Swal from "sweetalert2";
 import UseAxiosSecure from "../../hooks/useAxiosSecure";
+import { FaMapMarked } from "react-icons/fa";
+import { Link } from "react-router";
 // import { Link } from "react-router";
 
 const PAGE_SIZE = 6;
@@ -92,6 +94,7 @@ const ParcelTable = ({ parcels = [], refetch }) => {
       parcelId: parcel._id,
       senderEmail: parcel.senderEmail,
       cost: parcel.cost,
+      trackingId: parcel.trackingId,
     };
 
     const res = await axiosSecure.post(
@@ -164,7 +167,9 @@ const ParcelTable = ({ parcels = [], refetch }) => {
                   </td>
                   <td>
                     {parcel.paymentStatus === "paid" ? (
-                      <span className="text-green-600 bg-green-200 py-1 px-3 rounded-full font-medium">Paid</span>
+                      <span className="text-green-600 bg-green-200 py-1 px-3 rounded-full font-medium">
+                        Paid
+                      </span>
                     ) : (
                       // <Link to={`/dashboard/payment/${parcel._id}`}>
                       //   <button className="btn btn-xs btn-primary text-black">
@@ -191,18 +196,19 @@ const ParcelTable = ({ parcels = [], refetch }) => {
                   </td>
                   <td>
                     <div className="flex items-center gap-4 text-gray-500">
-                      <button className=" hover:text-secondary">
-                        <LuPencil size={14} />
-                      </button>
+                      <Link
+                        to={`/parcel-track/${parcel.trackingId}`}
+                        className="btn btn-xs hover:text-secondary"
+                        title="Tracking Parcel"
+                      >
+                        <FaMapMarked className="cursor-pointer" />
+                      </Link>
                       <button
                         onClick={() => handleParcelDelete(parcel._id)}
                         title="Parcel Delete"
-                        className="text-red-300 hover:text-red-600"
+                        className="text-red-300 btn btn-xs hover:text-red-600"
                       >
                         <RiDeleteBin5Line size={18} />
-                      </button>
-                      <button className=" hover:text-secondary">
-                        <HiOutlineDotsVertical className="cursor-pointer" />
                       </button>
                     </div>
                   </td>
