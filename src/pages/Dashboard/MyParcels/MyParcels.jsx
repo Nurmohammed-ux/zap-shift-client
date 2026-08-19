@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import UseAuth from "../../../hooks/useAuth";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { Link } from "react-router";
 import {
   FaBoxOpen,
@@ -13,25 +13,55 @@ import {
 import ParcelTable from "../../../componenets/ParcelTable/ParcelTable";
 import LateInvoices from "../../../componenets/LateInvoices/LateInvoices";
 import ShipmentAlerts from "../../../componenets/ShipmentAlerts/ShipmentAlerts";
+import { useMemo } from "react";
+import Loading from "../../../componenets/Loading/Loading";
 
 const MyParcels = () => {
   const { user } = UseAuth();
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
 
-  const { data: parcels = [], refetch } = useQuery({
+ const {
+    data: parcels = [],
+    refetch,
+    isLoading,
+  } = useQuery({
     queryKey: ["myParcels", user?.email],
+    enabled: !!user?.email, 
     queryFn: async () => {
-      const res = await axiosSecure.get(`/parcels?email=${user.email}`);
+      const res = await axiosSecure.get(`/parcels?email=${user?.email}`);
       return res.data;
     },
   });
 
+
+  const stats = useMemo(() => {
+    const toPay = parcels.filter((p) => p.paymentStatus !== "paid").length;
+    const readyForPickup = parcels.filter(
+      (p) => p.deliveryStatus === "ready-for-pickup",
+    ).length;
+    // "driver-assigned" + "rider-arriving" are both pre-pickup courier
+    // movement — grouped together as one stage.
+    const driverAssigned = parcels.filter((p) =>
+      ["driver-assigned", "rider-arriving"].includes(p.deliveryStatus),
+    ).length;
+    const pickedUp = parcels.filter(
+      (p) => p.deliveryStatus === "parcel-picked-up",
+    ).length;
+    const delivered = parcels.filter(
+      (p) => p.deliveryStatus === "parcel-delivered",
+    ).length;
+
+    return { toPay, readyForPickup, driverAssigned, pickedUp, delivered };
+  }, [parcels]);
+
+  if (isLoading) return <Loading />;
+
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center">
+    <div className="p-2 md:p-8">
+      <div className="flex flex-col md:flex-row justify-between gap-2 items-center">
         <div>
           <h2 className="text-3xl font-bold text-secondary">
-            Dashboard Overview
+            Parcels Overview
           </h2>
           <p className="text-gray-500">
             You can access all your data and information from here.{" "}
@@ -52,42 +82,52 @@ const MyParcels = () => {
           </div>
           <div className="flex flex-col">
             <h5 className="text-sm text-gray-500 font-medium">To Pay</h5>
-            <h4 className="text-3xl text-secondary font-extrabold">129</h4>
+            <h4 className="text-3xl text-secondary font-extrabold">
+              {stats.toPay}
+            </h4>
           </div>
         </div>
 
-        {/* Ready Pick UP */}
+        {/* Ready For Pickup */}
         <div className="bg-white p-6 rounded-3xl flex items-center gap-4 shadow-sm border border-gray-100">
           <div className="p-4 bg-gray-100 text-gray-500 rounded-full">
             <FaBoxOpen size={28} />
           </div>
           <div className="flex flex-col">
-            <h5 className="text-sm text-gray-500 font-medium">Ready Pick UP</h5>
-            <h4 className="text-3xl text-secondary font-extrabold">1320</h4>
+            <h5 className="text-sm text-gray-500 font-medium">
+              Ready For Pickup
+            </h5>
+            <h4 className="text-3xl text-secondary font-extrabold">
+              {stats.readyForPickup}
+            </h4>
           </div>
         </div>
 
-        {/* In Transit */}
+        {/* Driver Assigned (covers driver-assigned + rider-arriving) */}
         <div className="bg-white p-6 rounded-3xl flex items-center gap-4 shadow-sm border border-gray-100">
           <div className="p-4 bg-gray-100 text-gray-500 rounded-full">
             <FaTruckMoving size={28} />
           </div>
           <div className="flex flex-col">
-            <h5 className="text-sm text-gray-500 font-medium">In Transit</h5>
-            <h4 className="text-3xl text-secondary font-extrabold">50</h4>
+            <h5 className="text-sm text-gray-500 font-medium">
+              Driver Assigned
+            </h5>
+            <h4 className="text-3xl text-secondary font-extrabold">
+              {stats.driverAssigned}
+            </h4>
           </div>
         </div>
 
-        {/* Ready to Deliver */}
+        {/* Picked Up */}
         <div className="bg-white p-6 rounded-3xl flex items-center gap-4 shadow-sm border border-gray-100">
           <div className="p-4 bg-gray-100 text-gray-500 rounded-full">
             <FaHandHoldingHeart size={28} />
           </div>
           <div className="flex flex-col">
-            <h5 className="text-sm text-gray-500 font-medium">
-              Ready to Deliver
-            </h5>
-            <h4 className="text-3xl text-secondary font-extrabold">50</h4>
+            <h5 className="text-sm text-gray-500 font-medium">Picked Up</h5>
+            <h4 className="text-3xl text-secondary font-extrabold">
+              {stats.pickedUp}
+            </h4>
           </div>
         </div>
 
@@ -98,7 +138,9 @@ const MyParcels = () => {
           </div>
           <div className="flex flex-col">
             <h5 className="text-sm text-gray-500 font-medium">Delivered</h5>
-            <h4 className="text-3xl text-secondary font-extrabold">50</h4>
+            <h4 className="text-3xl text-secondary font-extrabold">
+              {stats.delivered}
+            </h4>
           </div>
         </div>
       </div>
@@ -106,8 +148,8 @@ const MyParcels = () => {
       <ParcelTable parcels={parcels} refetch={refetch} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
-        <LateInvoices />
-        <ShipmentAlerts />
+        <LateInvoices parcels={parcels} />
+        <ShipmentAlerts parcels={parcels} />
       </div>
     </div>
   );

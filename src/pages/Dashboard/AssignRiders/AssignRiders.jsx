@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MdAssignmentAdd } from "react-icons/md";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { FaUser } from "react-icons/fa6";
 import { FaMapMarkerAlt, FaTimes, FaPhone, FaMotorcycle } from "react-icons/fa";
 import { useRef, useState } from "react";
@@ -29,7 +29,7 @@ const getStatusBadge = (status) => {
 };
 
 const AssignRiders = () => {
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
   const assignModalRef = useRef();
   const [selectedParcel, setSelectedParcel] = useState(null);
   const queryClient = useQueryClient();

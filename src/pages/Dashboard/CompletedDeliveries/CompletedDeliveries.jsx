@@ -1,6 +1,6 @@
 import { FaClipboardCheck, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import UseAuth from "../../../hooks/useAuth";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -10,7 +10,7 @@ const formatWeight = (parcel) => {
 };
 
 const CompletedDeliveries = () => {
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
   const { user } = UseAuth();
   const [page, setPage] = useState(1);
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import {
   FaUser,
   FaIdCard,
@@ -17,7 +17,7 @@ import Swal from "sweetalert2";
 import UseAuth from "../../../hooks/useAuth";
 
 const ApprovedRider = () => {
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
   const { user } = UseAuth();
   const [selectedRider, setSelectedRider] = useState(null);
 

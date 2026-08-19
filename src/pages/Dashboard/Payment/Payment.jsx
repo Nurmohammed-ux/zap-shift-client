@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { FaShieldAlt, FaCreditCard, FaArrowLeft } from "react-icons/fa";
 
 const Payment = () => {
   const { parcelId } = useParams();
   const navigate = useNavigate();
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
 
   const { isLoading, data: parcel } = useQuery({
     queryKey: ["parcels", parcelId],

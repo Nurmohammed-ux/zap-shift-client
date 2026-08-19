@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { FaCheckCircle, FaArrowRight, FaCopy, FaCheck } from "react-icons/fa";
 import { Link, useSearchParams } from "react-router";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
   const sessionId = searchParams.get("session_id");
   const [paymentInfo, setPaymentInfo] = useState(null);
   const [copiedField, setCopiedField] = useState(null); 

@@ -1,4 +1,5 @@
 import Forbidden from "../componenets/Forbidden/Forbidden";
+import Loading from "../componenets/Loading/Loading";
 import UseAuth from "../hooks/useAuth";
 import UseRole from "../hooks/useRole";
 
@@ -7,11 +8,7 @@ const RiderRoute = ({ children }) => {
   const { role, roleLoading } = UseRole();
 
   if (loading || roleLoading) {
-    return (
-      <div className="flex justify-center py-36">
-        <span className="loading loading-spinner loading-xl text-primary"></span>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (role !== "rider") {

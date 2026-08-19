@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import {
   FaUsers,
   FaEnvelope,
@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 const UsersManagement = () => {
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [inputValue, setInputValue] = useState("");

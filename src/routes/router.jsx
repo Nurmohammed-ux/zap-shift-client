@@ -26,16 +26,14 @@ import AssignedDeliveries from "../pages/Dashboard/AssignedDeliveries/AssignedDe
 import RiderRoute from "./RiderRoute";
 import CompletedDeliveries from "../pages/Dashboard/CompletedDeliveries/CompletedDeliveries";
 import ParcelTrack from "../pages/ParcelTrack/ParcelTrack";
+import DashboardHome from "../pages/Dashboard/DashBoardHome/DashboardHome";
+import Loading from "../componenets/Loading/Loading";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
-    hydrateFallbackElement: (
-      <div className="flex justify-center py-36">
-        <span className="loading loading-spinner loading-xl text-primary"></span>
-      </div>
-    ),
+    hydrateFallbackElement: <Loading />,
     children: [
       {
         index: true,
@@ -82,7 +80,7 @@ const router = createBrowserRouter([
       },
       {
         path: "parcel-track/:trackingId",
-        element: <ParcelTrack />
+        element: <ParcelTrack />,
       },
       {
         path: "*",
@@ -112,6 +110,10 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
+      {
+        index: true,
+        element: <DashboardHome />,
+      },
       {
         path: "my-parcels",
         element: <MyParcels />,

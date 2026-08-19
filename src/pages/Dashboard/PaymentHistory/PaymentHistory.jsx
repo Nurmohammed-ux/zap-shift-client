@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import UseAuth from "../../../hooks/useAuth";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import {
   FaReceipt,
   FaMapMarkerAlt,
@@ -14,7 +14,7 @@ import { useState } from "react";
 
 const PaymentHistory = () => {
   const { user } = UseAuth();
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
   const [selectedPayment, setSelectedPayment] = useState(null);
 
   const PAGE_SIZE = 8;

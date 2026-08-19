@@ -3,7 +3,7 @@ import rider from "../../assets/agent-pending.png";
 import { useLoaderData, useNavigate } from "react-router";
 import { useEffect } from "react";
 import UseAuth from "../../hooks/useAuth";
-import UseAxiosSecure from "../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 
 const Rider = () => {
@@ -16,7 +16,7 @@ const Rider = () => {
   } = useForm();
 
   const { user } = UseAuth();
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
   const serviceCenters = useLoaderData();
   const selectedRegion = watch("region");
   const selectedDistrict = watch("district");

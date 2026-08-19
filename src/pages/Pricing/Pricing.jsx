@@ -1,12 +1,12 @@
 import { useLocation, useNavigate, Link } from "react-router";
 import Swal from "sweetalert2";
-import UseAxiosSecure from "../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Pricing = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { parcelInfo, cost, sameCity } = location.state || {};
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
   // console.log(parcelInfo);
 
   // Guard against someone landing here directly (refresh, bookmark, etc.)

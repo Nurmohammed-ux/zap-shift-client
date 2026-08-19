@@ -14,15 +14,17 @@ import { FaTasks, FaUsers } from "react-icons/fa";
 import UseRole from "../hooks/useRole";
 import { MdAssignmentAdd } from "react-icons/md";
 
-const linkBaseStyle =
-  "is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-3 w-full text-base px-3 py-2";
-
+// Unified base style + conditional active/inactive styles
 const getLinkClass = ({ isActive }) =>
-  `${linkBaseStyle} ${
+  `is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-3 w-full text-base px-3 py-2 transition-colors duration-200 ${
     isActive
-      ? "bg-primary font-semibold rounded-full"
-      : "text-black font-light hover:text-gray-900"
+      ? "bg-primary font-semibold rounded-full text-secondary"
+      : "text-black font-light hover:bg-gray-100 hover:text-gray-900 rounded-full"
   }`;
+
+// For regular button/links (like Logout) that don't use NavLink's isActive
+const staticLinkStyle =
+  "is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-3 w-full text-base px-3 py-2 text-black font-light hover:bg-gray-100 hover:text-gray-900 rounded-full transition-colors duration-200";
 
 const DashboardLayout = () => {
   const { logOut } = UseAuth();
@@ -61,39 +63,35 @@ const DashboardLayout = () => {
             className="drawer-overlay"
           ></label>
 
-          {/* Added bg-base-200 and shadow to prevent transparency/overlapping text */}
+          {/* Sidebar container */}
           <div className="flex min-h-full flex-col items-start w-64 lg:is-drawer-close:w-14 bg-white shadow-lg transition-all duration-300">
-            {/* Sidebar content here */}
+            {/* Logo Header */}
             <div className="p-4 w-full">
-              {/* Shown only when open */}
               <span className="is-drawer-close:hidden">
                 <Logo />
               </span>
-              {/* Shown only when closed */}
               <Link to={"/"} className="hidden is-drawer-close:block">
                 <img src={logoImg} alt="Logo" className="w-8 h-8" />
               </Link>
             </div>
 
             <div className="px-4 py-2 w-full">
-              {/* Shown fully when the sidebar is open */}
               <h4 className="is-drawer-close:hidden px-2 text-base font-medium text-gray-900">
                 Menu
               </h4>
-
-              {/* Shown as a subtle divider or small dot when the sidebar is closed */}
               <div className="hidden is-drawer-close:flex justify-center my-2">
                 <span className="h-0.5 w-3 bg-gray-300 rounded-full"></span>
               </div>
             </div>
 
             <ul className="menu w-full grow py-1 px-1.5 is-drawer-open:px-4 gap-2">
-              {/* Homepage button styled consistently */}
+              {/* Homepage button */}
               <li>
                 <NavLink
-                  to={"/"}
-                  className={`${linkBaseStyle} text-black font-light hover:text-gray-900`}
-                  data-tip="Homepage"
+                  to={"/dashboard"}
+                  className={getLinkClass}
+                  end
+                  data-tip="Dashboard"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -109,17 +107,17 @@ const DashboardLayout = () => {
                     <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                   </svg>
                   <span className="is-drawer-close:hidden truncate">
-                    Homepage
+                    Dashboard
                   </span>
                 </NavLink>
               </li>
 
-              {/* Dashboard NavLink */}
+              {/* my parcels NavLink */}
               <li>
                 <NavLink
                   to={"/dashboard/my-parcels"}
                   className={getLinkClass}
-                  data-tip="Dashboard"
+                  data-tip="My Parcels"
                 >
                   <img
                     src={dashImg}
@@ -127,7 +125,7 @@ const DashboardLayout = () => {
                     className="my-1.5 size-4 shrink-0"
                   />
                   <span className="is-drawer-close:hidden truncate">
-                    Dashboard
+                    My Parcels
                   </span>
                 </NavLink>
               </li>
@@ -135,28 +133,25 @@ const DashboardLayout = () => {
               {/* Rider only Links */}
               {role === "rider" && (
                 <>
-                {/* Assigned Deliveries */}
                   <li>
                     <NavLink
                       to={"/dashboard/assigned-deliveries"}
                       className={getLinkClass}
                       data-tip="Assigned Deliveries"
                     >
-                      <FaTasks className="my-1.5 size-4 shrink-0 text-gray-600" />
+                      <FaTasks className="my-1.5 size-4 shrink-0" />
                       <span className="is-drawer-close:hidden truncate">
                         Assigned Deliveries
                       </span>
                     </NavLink>
                   </li>
-
-                {/* Completed Deliveries */}
                   <li>
                     <NavLink
                       to={"/dashboard/completed-deliveries"}
                       className={getLinkClass}
                       data-tip="Completed Deliveries"
                     >
-                      <FaClipboardCheck className="my-1.5 size-5 -ml-0.5 shrink-0 text-gray-600" />
+                      <FaClipboardCheck className="my-1.5 size-5 -ml-0.5 shrink-0" />
                       <span className="is-drawer-close:hidden truncate">
                         Completed Deliveries
                       </span>
@@ -168,42 +163,37 @@ const DashboardLayout = () => {
               {/* Admin only links */}
               {role === "admin" && (
                 <>
-                  {/* Users Management NavLink */}
                   <li>
                     <NavLink
                       to={"/dashboard/users-management"}
                       className={getLinkClass}
                       data-tip="Users Management"
                     >
-                      <FaUsers className="my-1.5 size-5 -ml-px shrink-0 text-gray-600" />
+                      <FaUsers className="my-1.5 size-5 -ml-px shrink-0" />
                       <span className="is-drawer-close:hidden truncate">
                         Users Management
                       </span>
                     </NavLink>
                   </li>
-
-                  {/* Riders NavLink */}
                   <li>
                     <NavLink
                       to={"/dashboard/approve-riders"}
                       className={getLinkClass}
                       data-tip="Approve Riders"
                     >
-                      <FaMotorcycle className="my-1.5 size-5 -ml-px shrink-0 text-gray-600" />
+                      <FaMotorcycle className="my-1.5 size-5 -ml-px shrink-0" />
                       <span className="is-drawer-close:hidden truncate">
                         Approve Riders
                       </span>
                     </NavLink>
                   </li>
-
-                  {/* Assign Riders NavLink */}
                   <li>
                     <NavLink
                       to={"/dashboard/assign-riders"}
                       className={getLinkClass}
                       data-tip="Assign Riders"
                     >
-                      <MdAssignmentAdd className="my-1.5 size-5 -ml-px shrink-0 text-gray-600" />
+                      <MdAssignmentAdd className="my-1.5 size-5 -ml-px shrink-0" />
                       <span className="is-drawer-close:hidden truncate">
                         Assign Riders
                       </span>
@@ -219,7 +209,7 @@ const DashboardLayout = () => {
                   className={getLinkClass}
                   data-tip="Payment History"
                 >
-                  <TbFileInvoice className="my-1.5 size-5 -ml-0.5 shrink-0 text-gray-600" />
+                  <TbFileInvoice className="my-1.5 size-5 -ml-0.5 shrink-0" />
                   <span className="is-drawer-close:hidden truncate">
                     Payment History
                   </span>
@@ -270,23 +260,20 @@ const DashboardLayout = () => {
             </ul>
 
             <div className="px-4 pt-auto pb-2 w-full">
-              {/* Shown fully when the sidebar is open */}
               <h4 className="is-drawer-close:hidden px-2 text-base font-medium text-gray-900">
                 GENERAL
               </h4>
-
-              {/* Shown as a subtle divider or small dot when the sidebar is closed */}
               <div className="hidden is-drawer-close:flex justify-center my-2">
                 <span className="h-0.5 w-3 bg-gray-300 rounded-full"></span>
               </div>
             </div>
 
             <ul className="menu w-full grow py-1 px-2 is-drawer-open:px-4 gap-2">
-              {/* Settings button styled consistently */}
+              {/* Settings button */}
               <li>
                 <NavLink
                   to={"/dashboard/settings"}
-                  className={`${linkBaseStyle} text-black font-light hover:text-gray-900`}
+                  className={getLinkClass}
                   data-tip="Settings"
                 >
                   <svg
@@ -310,11 +297,11 @@ const DashboardLayout = () => {
                 </NavLink>
               </li>
 
-              {/* Change Password styled  */}
+              {/* Change Password */}
               <li>
                 <NavLink
                   to={"/login"}
-                  className={`${linkBaseStyle} text-black font-light hover:text-gray-900`}
+                  className={getLinkClass}
                   data-tip="Change Password"
                 >
                   <RiLockPasswordLine className="my-1.5 size-4.5 shrink-0" />
@@ -324,11 +311,11 @@ const DashboardLayout = () => {
                 </NavLink>
               </li>
 
-              {/* Help NavLink styled  */}
+              {/* Help */}
               <li>
                 <NavLink
                   to={"/dashboard/help"}
-                  className={`${linkBaseStyle} text-black font-light hover:text-gray-900`}
+                  className={getLinkClass}
                   data-tip="Help"
                 >
                   <IoMdHelpCircleOutline className="my-1.5 size-4.5 shrink-0" />
@@ -336,11 +323,11 @@ const DashboardLayout = () => {
                 </NavLink>
               </li>
 
-              {/* LogOut NavLink styled  */}
+              {/* LogOut */}
               <li>
                 <button
                   onClick={handleLogout}
-                  className={`${linkBaseStyle} text-black font-light hover:text-gray-900`}
+                  className={staticLinkStyle}
                   data-tip="LogOut"
                 >
                   <IoIosLogOut className="my-1.5 size-4.5 shrink-0" />

@@ -5,16 +5,17 @@ import {
   FaMapMarkerAlt,
   FaCheckCircle,
   FaClock,
-  FaPlusCircle, // 👈 Import new icon for parcel creation
+  FaPlusCircle,
 } from "react-icons/fa";
 import { useParams } from "react-router";
-import UseAxiosSecure from "../../hooks/useAxiosSecure";
 import { FaMotorcycle, FaPersonWalking } from "react-icons/fa6";
+import useAxios from "../../hooks/useAxios";
+import Loading from "../../componenets/Loading/Loading";
 
 const getStatusIcon = (status) => {
   switch (status?.toLowerCase()) {
     case "parcel-created":
-      return <FaPlusCircle className="text-indigo-500" />; 
+      return <FaPlusCircle className="text-indigo-500" />;
     case "ready-for-pickup":
       return <FaBox className="text-amber-500" />;
     case "driver-assigned":
@@ -33,12 +34,12 @@ const getStatusIcon = (status) => {
 
 const ParcelTrack = () => {
   const { trackingId } = useParams();
-  const axiosSecure = UseAxiosSecure();
+  const axios = useAxios();
 
   const { data: trackings = [], isLoading } = useQuery({
     queryKey: ["tracking", trackingId],
     queryFn: async () => {
-      const res = await axiosSecure(`/trackings/${trackingId}/logs`);
+      const res = await axios(`/trackings/${trackingId}/logs`);
       return res.data;
     },
     enabled: !!trackingId,
@@ -79,11 +80,7 @@ const ParcelTrack = () => {
       </div>
 
       {/* Loading State */}
-      {isLoading && (
-        <div className="flex justify-center py-20">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-        </div>
-      )}
+      {isLoading && <Loading />}
 
       {/* Tracking ID Badge Summary */}
       {!isLoading && trackingId && (

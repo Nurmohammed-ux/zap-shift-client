@@ -6,7 +6,7 @@ import {
   FaTimes,
   FaUser,
 } from "react-icons/fa";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import UseAuth from "../../../hooks/useAuth";
 import { useState } from "react";
 import Swal from "sweetalert2";
@@ -43,7 +43,7 @@ const formatWeight = (parcel) => {
 };
 
 const AssignedDeliveries = () => {
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
   const { user } = UseAuth();
   const [page, setPage] = useState(1);
 

@@ -22,9 +22,6 @@ const Navbar = () => {
       <NavLink to={"/coverage"} className={getLinkClass}>
         Coverage
       </NavLink>
-      <NavLink to={"/aboutUs"} className={getLinkClass}>
-        About Us
-      </NavLink>
       <NavLink to={"/sendParcel"} className={getLinkClass}>
         Send Parcel
       </NavLink>
@@ -36,13 +33,19 @@ const Navbar = () => {
           <NavLink to={"/dashboard/my-parcels"} className={getLinkClass}>
             My Parcels
           </NavLink>
+          <NavLink to={"/dashboard"} className={getLinkClass}>
+            Dashboard
+          </NavLink>
         </>
       )}
+      <NavLink to={"/aboutUs"} className={getLinkClass}>
+        About Us
+      </NavLink>
     </>
   );
   return (
     <div className="px-2 md:px-14 py-4 lg:pt-6">
-      <nav className="navbar bg-white px-18 py-5 md:px-6 rounded-xl flex flex-col md:flex-row  items-start  md:items-center gap-3 md:gap-0">
+      <nav className="navbar bg-white px-18 py-5 md:px-6 rounded-xl flex flex-col md:flex-row  items-start  md:items-center md:justify-between gap-3 md:gap-0">
         <div className="navbar-start">
           <div className="dropdown mr-2">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">

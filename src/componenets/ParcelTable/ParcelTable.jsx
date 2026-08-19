@@ -3,7 +3,7 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import { LuCalendar, LuChevronDown, LuFilter } from "react-icons/lu";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import Swal from "sweetalert2";
-import UseAxiosSecure from "../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { FaMapMarked } from "react-icons/fa";
 import { Link } from "react-router";
 // import { Link } from "react-router";
@@ -50,7 +50,7 @@ const formatWeight = (parcel) => {
 
 const ParcelTable = ({ parcels = [], refetch }) => {
   const [page, setPage] = useState(1);
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
 
   const totalPages = Math.max(1, Math.ceil(parcels.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -89,7 +89,7 @@ const ParcelTable = ({ parcels = [], refetch }) => {
   };
 
   const handlePayment = async (parcel) => {
-    const paymentInfo = {
+    const parcelInfo = {
       parcelName: parcel.parcelName,
       parcelId: parcel._id,
       senderEmail: parcel.senderEmail,
@@ -99,7 +99,7 @@ const ParcelTable = ({ parcels = [], refetch }) => {
 
     const res = await axiosSecure.post(
       `/payment-checkout-session`,
-      paymentInfo,
+      parcelInfo,
     );
 
     // console.log(res.data.url);

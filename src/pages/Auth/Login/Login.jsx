@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router";
 import useAuth from "../../../hooks/useAuth";
-import UseAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +16,7 @@ const Login = () => {
   const { signInUser, signInWithGoogle, resetPassword } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const axiosSecure = UseAxiosSecure();
+  const axiosSecure = useAxiosSecure();
 
   const handleLogin = (data) => {
     // console.log("after login", data);

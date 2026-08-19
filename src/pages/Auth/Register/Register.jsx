@@ -164,7 +164,7 @@ const Register = () => {
               placeholder="Name"
             />
             {errors.name?.type === "required" && (
-              <p className="text-red-500">Email is required</p>
+              <p className="text-red-500">Name is required</p>
             )}
             {/* email */}
             <label className="label text-base font-semibold text-gray-700 my-2">
