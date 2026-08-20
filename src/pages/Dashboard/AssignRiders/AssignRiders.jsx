@@ -34,7 +34,7 @@ const AssignRiders = () => {
   const [selectedParcel, setSelectedParcel] = useState(null);
   const queryClient = useQueryClient();
 
-  const { data: parcels = [], refetch } = useQuery({
+  const { data: parcels = [], refetch: parcelRefetch } = useQuery({
     queryKey: ["parcels", "admin-dispatch-pool"],
     queryFn: async () => {
       const res = await axiosSecure.get(
@@ -44,7 +44,7 @@ const AssignRiders = () => {
     },
   });
 
-  const { data: riders = [] } = useQuery({
+  const { data: riders = [], refetch: riderRefetch } = useQuery({
     queryKey: ["rider", selectedParcel?.senderDistrict, "available"],
     enabled: !!selectedParcel,
     queryFn: async () => {
@@ -89,7 +89,8 @@ const AssignRiders = () => {
           timer: 1500,
         });
 
-        refetch();
+        parcelRefetch();
+        riderRefetch();
       }
     } catch (error) {
       console.error(error);
