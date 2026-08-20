@@ -23,7 +23,7 @@ const Login = () => {
     const email = data.email;
     const password = data.password;
 
-    console.log(email, password);
+    // console.log(email, password);
     signInUser(email, password)
       .then(() => {
         // console.log(result.user);
@@ -38,7 +38,6 @@ const Login = () => {
   const handleLoginWithGoogle = () => {
     signInWithGoogle()
       .then((result) => {
-        
         // create user in database
         const userInfo = {
           displayName: result.user.displayName,
@@ -46,11 +45,7 @@ const Login = () => {
           photoURL: result.user.photoURL,
         };
 
-        axiosSecure
-          .post("/users", userInfo)
-          .then((res) =>
-            console.log("user data has been stored in db", res.data),
-          );
+        axiosSecure.post("/users", userInfo).then(() => {});
         navigate(location?.state || "/");
       })
       .catch((error) => {

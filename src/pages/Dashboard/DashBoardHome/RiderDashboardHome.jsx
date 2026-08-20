@@ -143,10 +143,10 @@ const RiderDashboardHome = () => {
   return (
     <div className="p-2 md:p-8 flex flex-col gap-6">
       <div>
-        <h2 className="text-3xl font-bold text-secondary">
-          Welcome back{user?.displayName ? `, ${user.displayName}` : ""}
+        <h2 className="text-2xl font-bold text-secondary">
+          Welcome back Rider {user?.displayName ? `: ${user.displayName}` : ""}
         </h2>
-        <p className="text-gray-500">Here's a quick look at your deliveries.</p>
+        <p className="text-gray-500 mt-2">Here's a quick look at your deliveries.</p>
       </div>
 
       <div className="border-t border-dashed border-gray-300" />

@@ -44,7 +44,7 @@ const AssignRiders = () => {
     },
   });
 
-  const { data: riders = [], refetch: riderRefetch } = useQuery({
+  const { data: riders = [] } = useQuery({
     queryKey: ["rider", selectedParcel?.senderDistrict, "available"],
     enabled: !!selectedParcel,
     queryFn: async () => {
@@ -90,7 +90,6 @@ const AssignRiders = () => {
         });
 
         parcelRefetch();
-        riderRefetch();
       }
     } catch (error) {
       console.error(error);

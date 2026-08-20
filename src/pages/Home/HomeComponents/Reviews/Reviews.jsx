@@ -70,6 +70,7 @@ const Reviews = () => {
         grabCursor={true}
         centeredSlides={true}
         loop={true}
+        loopAddBlankSlides={true}
         autoplay={{
           delay: 3500,
           disableOnInteraction: false,

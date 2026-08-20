@@ -17,6 +17,7 @@ const Hero = () => {
           modules={[Autoplay]}
           autoplay={{ delay: 4000, disableOnInteraction: false }}
           loop={true}
+          loopAddBlankSlides={true}
           slidesPerView={1}
           className="heroSwiper"
         >

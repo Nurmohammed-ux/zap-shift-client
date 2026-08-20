@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AreaChart,
   Area,
@@ -19,9 +19,16 @@ import {
   RiMoneyDollarCircleLine,
 } from "react-icons/ri";
 import { HiOutlineDotsVertical } from "react-icons/hi";
-import { LuCalendar, LuChevronDown, LuFilter, LuPackage } from "react-icons/lu";
+import {
+  LuCalendar,
+  LuChevronDown,
+  LuFilter,
+  LuPackage,
+  LuRefreshCw,
+} from "react-icons/lu";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Loading from "../../../componenets/Loading/Loading";
+import UseAuth from "../../../hooks/useAuth";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const PAGE_SIZE = 6;
@@ -84,6 +91,8 @@ const AdminDashboardHome = () => {
   const axiosSecure = useAxiosSecure();
   const [page, setPage] = useState(1);
   const [sortOrder, setSortOrder] = useState("latest");
+  const queryClient = useQueryClient();
+  const { user } = UseAuth();
 
   // parcels
   const { data: parcels = [], isLoading } = useQuery({
@@ -204,12 +213,22 @@ const AdminDashboardHome = () => {
   return (
     <div className="p-8 flex flex-col gap-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-secondary">Admin Overview</h2>
-          <p className="text-gray-500">
-            Platform-wide activity across all users and riders.
-          </p>
+      <div>
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-secondary">
+              Welcome back Admin  {user?.displayName ? `: ${user.displayName}` : ""}
+            </h2>
+            <p className="text-gray-500">
+              Platform-wide activity across all users and riders.
+            </p>
+          </div>
+          <button
+            onClick={() => queryClient.invalidateQueries()}
+            className="btn bg-primary/50 text-black border border-gray-300 rounded-full gap-2 font-normal"
+          >
+            <LuRefreshCw className="text-gray-700" size={14} /> Refresh
+          </button>
         </div>
       </div>
 
